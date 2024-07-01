@@ -3,18 +3,13 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import React from 'react';
 import Icon from 'react-native-vector-icons/Ionicons';
-import Home from '../screens/Home/Home';
-import Profile from '../screens/Profile/Profile';
-import Splash from '../screens/Splash/Splash';
-import Email from '../screens/TeacherSite/ForgetPassword/Email';
-import Otp from '../screens/TeacherSite/ForgetPassword/Otp';
-import ResetPassword from '../screens/TeacherSite/ForgetPassword/ResetPassword';
-import Login from '../screens/TeacherSite/Login/Login';
-import SignUp from '../screens/TeacherSite/SignUp/SignUp';
-import Wellcome from '../screens/TeacherSite/Wellcome/wellcome';
 import UserType from '../screens/UserType/UserType';
-import ScribbleBottom from './ScribbleBottom';
-import StudentNavigation from './StudentNavigation';
+import Studentwellcome from '../screens/StudentSite/StudentWellcome/StudentWellcome';
+import StudentLogin from '../screens/StudentSite/StudentLogin/StudentLogin';
+import StudentSignUp from '../screens/StudentSite/StudentSignUp/StudentSignUp';
+import StudentEmail from '../screens/StudentSite/StudentForgetPassword/StudentEmail';
+import StudentOtp from '../screens/StudentSite/StudentForgetPassword/StudentOtp';
+import StudentResetPassword from '../screens/StudentSite/StudentForgetPassword/StudentResetPassword';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -46,9 +41,11 @@ function MyTabs() {
   );
 }
 
-const MainNavigation = () => {
+const StudentNavigation = () => {
   return (
-    <Stack.Navigator screenOptions={{ headerShown: false }}>
+    <Stack.Navigator
+      initialRouteName="Studentwellcome"
+      screenOptions={{ headerShown: false }}>
       {/* <Stack.Screen
           name="HomeBase"
           options={{ headerShown: false }}
@@ -62,43 +59,39 @@ const MainNavigation = () => {
         /> */}
 
       <Stack.Screen
-        name="Wellcome"
+        name="Studentwellcome"
         options={{ headerShown: false }}
-        component={Wellcome}
+        component={Studentwellcome}
       />
 
       <Stack.Screen
-        name="Login"
+        name="StudentLogin"
         options={{ headerShown: false }}
-        component={Login}
+        component={StudentLogin}
       />
       <Stack.Screen
-        name="SignUp"
+        name="StudentSignUp"
         options={{ headerShown: false }}
-        component={SignUp}
+        component={StudentSignUp}
+      />
+
+      <Stack.Screen
+        name="StudentEmail"
+        options={{ headerShown: false }}
+        component={StudentEmail}
       />
       <Stack.Screen
-        name="ScribbleBottom"
+        name="StudentOtp"
         options={{ headerShown: false }}
-        component={ScribbleBottom}
+        component={StudentOtp}
       />
       <Stack.Screen
-        name="Email"
+        name="StudentResetPassword"
         options={{ headerShown: false }}
-        component={Email}
-      />
-      <Stack.Screen
-        name="Otp"
-        options={{ headerShown: false }}
-        component={Otp}
-      />
-      <Stack.Screen
-        name="ResetPassword"
-        options={{ headerShown: false }}
-        component={ResetPassword}
+        component={StudentResetPassword}
       />
     </Stack.Navigator>
   );
 };
 
-export default MainNavigation;
+export default StudentNavigation;
