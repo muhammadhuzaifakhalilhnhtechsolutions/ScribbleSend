@@ -3,6 +3,7 @@ import {
   Dimensions,
   SafeAreaView,
   ScrollView,
+  StatusBar,
   StyleSheet,
   Text,
   View,
@@ -19,6 +20,7 @@ const UserType = ({ navigation }) => {
 
   return (
     <SafeAreaView style={styles.main}>
+      <StatusBar translucent hidden/>
       <ScrollView contentContainerStyle={{ height: HEIGHT.height / 1 }}>
         <View style={styles.ImageDiv}>
           <FastImage
