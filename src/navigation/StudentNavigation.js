@@ -10,36 +10,37 @@ import StudentSignUp from '../screens/StudentSite/StudentSignUp/StudentSignUp';
 import StudentEmail from '../screens/StudentSite/StudentForgetPassword/StudentEmail';
 import StudentOtp from '../screens/StudentSite/StudentForgetPassword/StudentOtp';
 import StudentResetPassword from '../screens/StudentSite/StudentForgetPassword/StudentResetPassword';
+import StudentDasboard from '../screens/StudentSite/StudentDasboard/StudentDasboard';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
 
-function MyTabs() {
-  return (
-    <Tab.Navigator>
-      <Tab.Screen
-        name="Home"
-        component={Home}
-        options={{
-          headerShown: false,
-          tabBarIcon: ({ color }) => {
-            return <Icon name={'home-outline'} size={25} color={color} />;
-          },
-        }}
-      />
-      <Tab.Screen
-        name="Profile"
-        component={Profile}
-        options={{
-          headerShown: false,
-          tabBarIcon: ({ color }) => {
-            return <Icon name={'finger-print-sharp'} size={25} color={color} />;
-          },
-        }}
-      />
-    </Tab.Navigator>
-  );
-}
+// function MyTabs() {
+//   return (
+//     <Tab.Navigator>
+//       <Tab.Screen
+//         name="Home"
+//         component={Home}
+//         options={{
+//           headerShown: false,
+//           tabBarIcon: ({ color }) => {
+//             return <Icon name={'home-outline'} size={25} color={color} />;
+//           },
+//         }}
+//       />
+//       <Tab.Screen
+//         name="Profile"
+//         component={Profile}
+//         options={{
+//           headerShown: false,
+//           tabBarIcon: ({ color }) => {
+//             return <Icon name={'finger-print-sharp'} size={25} color={color} />;
+//           },
+//         }}
+//       />
+//     </Tab.Navigator>
+//   );
+// }
 
 const StudentNavigation = () => {
   return (
@@ -73,6 +74,11 @@ const StudentNavigation = () => {
         name="StudentSignUp"
         options={{ headerShown: false }}
         component={StudentSignUp}
+      />
+        <Stack.Screen
+        name="StudentDasboard"
+        options={{ headerShown: false }}
+        component={StudentDasboard}
       />
 
       <Stack.Screen

@@ -7,7 +7,6 @@ import Auth from './Auth';
 const AllScreens = () => {
   const Role = 'Student';
   const token = false;
-
   return token ? (
     Role == 'Student' ? (
       <StudentNavigation />

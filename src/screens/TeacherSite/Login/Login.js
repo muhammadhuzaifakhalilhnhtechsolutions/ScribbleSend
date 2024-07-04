@@ -59,7 +59,7 @@ const Login = ({ navigation }) => {
               </View>
 
               <Button
-                onPress={() => navigation.navigate('ScribbleBottom')}
+                onPress={() => navigation.navigate('Dasboard')}
                 title={'Sign in'}
                 style={styles.SigninButton}
               />

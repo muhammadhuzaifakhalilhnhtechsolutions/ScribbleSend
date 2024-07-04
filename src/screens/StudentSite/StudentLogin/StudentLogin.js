@@ -59,7 +59,7 @@ const StudentLogin = ({ navigation }) => {
               </View>
 
               <Button
-                onPress={() => navigation.navigate('ScribbleBottom')}
+                onPress={() => navigation.navigate('StudentDasboard')}
                 title={'Sign in'}
                 style={styles.SigninButton}
               />

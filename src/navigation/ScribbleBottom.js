@@ -1,14 +1,13 @@
-import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
-import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import React from 'react';
+import { StyleSheet, View } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
-import { White,ThemoColor, LightGrey, Black, BottomGrey } from '../utils/Color';
-import Home from '../screens/TeacherSite/Dasboard/Dasboard';
-import Clander from '../screens/TeacherSite/Clander/Clander';
-import Chat from '../screens/TeacherSite/Chat/Chat';
 import Profile from '../screens/Profile/Profile';
+import Chat from '../screens/TeacherSite/Chat/Chat';
+import Clander from '../screens/TeacherSite/Clander/Clander';
 import Dasboard from '../screens/TeacherSite/Dasboard/Dasboard';
+import { Black, BottomGrey, ThemoColor, White } from '../utils/Color';
 
 
 const Tab = createBottomTabNavigator();

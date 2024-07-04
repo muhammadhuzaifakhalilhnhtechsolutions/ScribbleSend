@@ -33,8 +33,7 @@ const Wellcome = ({ navigation }) => {
               style={styles.LoginButton}
             />
             <Button
-         onPress={() => navigation.navigate('SignUp')}
-
+              onPress={() => navigation.navigate('SignUp')}
               style={styles.Register}
               title={'Register'}
               textStyle={styles.text}

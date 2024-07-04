@@ -1,20 +1,16 @@
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import React from 'react';
 import Icon from 'react-native-vector-icons/Ionicons';
 import Home from '../screens/Home/Home';
 import Profile from '../screens/Profile/Profile';
-import Splash from '../screens/Splash/Splash';
+import Dasboard from '../screens/TeacherSite/Dasboard/Dasboard';
 import Email from '../screens/TeacherSite/ForgetPassword/Email';
 import Otp from '../screens/TeacherSite/ForgetPassword/Otp';
 import ResetPassword from '../screens/TeacherSite/ForgetPassword/ResetPassword';
 import Login from '../screens/TeacherSite/Login/Login';
 import SignUp from '../screens/TeacherSite/SignUp/SignUp';
 import Wellcome from '../screens/TeacherSite/Wellcome/wellcome';
-import UserType from '../screens/UserType/UserType';
-import ScribbleBottom from './ScribbleBottom';
-import StudentNavigation from './StudentNavigation';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -78,9 +74,9 @@ const MainNavigation = () => {
         component={SignUp}
       />
       <Stack.Screen
-        name="ScribbleBottom"
+        name="Dasboard"
         options={{ headerShown: false }}
-        component={ScribbleBottom}
+        component={Dasboard}
       />
       <Stack.Screen
         name="Email"

@@ -1,20 +1,28 @@
-import { StyleSheet, Text, View ,SafeAreaView, StatusBar} from 'react-native'
-import React from 'react'
-import { White } from '../../../utils/Color'
+import { StyleSheet, Text, View, SafeAreaView, StatusBar } from 'react-native';
+import React from 'react';
+import { Black, ThemoColor, White } from '../../../utils/Color';
 
 const Dasboard = () => {
   return (
     <SafeAreaView style={styles.Main}>
-     <StatusBar backgroundColor={White} barStyle="dark-content" />
+      <StatusBar backgroundColor={ThemoColor} hidden={false} />
+      <StatusBar backgroundColor={White} barStyle="dark-content" />
+      <Text style={styles.text}>Wellcome To Dashboard</Text>
     </SafeAreaView>
-  )
-}
+  );
+};
 
-export default Dasboard
+export default Dasboard;
 
 const styles = StyleSheet.create({
-  Main:{
-    flex:1,
-    backgroundColor:White
+  Main: {
+    flex: 1,
+    backgroundColor: White,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
-})
+  text: {
+    color: Black,
+    fontSize: 15,
+  },
+});

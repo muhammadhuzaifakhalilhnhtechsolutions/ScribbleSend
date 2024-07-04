@@ -1,28 +1,24 @@
 import React, { useState } from 'react';
 import {
-    Dimensions,
-    ImageBackground,
-    KeyboardAvoidingView,
-    Platform,
-    SafeAreaView,
-    ScrollView,
-    StatusBar,
-    StyleSheet,
-    Text,
-    View
+  Dimensions,
+  ImageBackground,
+  KeyboardAvoidingView,
+  Platform,
+  SafeAreaView,
+  ScrollView,
+  StatusBar,
+  StyleSheet,
+  Text,
+  View,
 } from 'react-native';
 import {
-    CodeField,
-    Cursor,
-    useBlurOnFulfill,
-    useClearByFocusCell,
+  CodeField,
+  Cursor,
+  useBlurOnFulfill,
+  useClearByFocusCell,
 } from 'react-native-confirmation-code-field';
 import Button from '../../../components/Button/Button';
-import {
-    Black,
-    ThemoColor,
-    White
-} from '../../../utils/Color';
+import { Black, ThemoColor, White } from '../../../utils/Color';
 import { PopingBold, PoppinsRegular } from '../../../utils/Fonts';
 const { height, width } = Dimensions.get('screen');
 const Otp = ({ navigation, props }) => {
@@ -124,9 +120,9 @@ const styles = StyleSheet.create({
     textAlignVertical: 'center',
     overflow: 'hidden',
   },
-  focusCell:{
-    borderWidth:1,
-    borderColor:ThemoColor
+  focusCell: {
+    borderWidth: 1,
+    borderColor: ThemoColor,
   },
 
   underlineStyleBase: {
