@@ -5,7 +5,6 @@ import {
   Text,
   View,
   TouchableOpacity,
-  Modal,
   StatusBar,
 } from 'react-native';
 import Svg, { Path } from 'react-native-svg';
@@ -14,8 +13,9 @@ import {
   GestureDetector,
   Gesture,
 } from 'react-native-gesture-handler';
-import Slider from '@react-native-community/slider';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import DraggableText from '../../components/DragableText/DragableText';
+import { PenModal, TextModal } from '../../components/Modals/Modals';
 
 const Home = () => {
   const [currentStroke, setCurrentStroke] = useState({
@@ -31,10 +31,67 @@ const Home = () => {
   const [baseScale, setBaseScale] = useState(1);
   const [pinchScale, setPinchScale] = useState(1);
   const [eraseMode, setEraseMode] = useState(false);
+  const [zoomEnabled, setZoomEnabled] = useState(false);
+  const zoomFactor = 2;
+  const [textMode, setTextMode] = useState(false);
+  const [modalVisibleText, setModalVisibleText] = useState(false);
+  const [activeTextIndex, setActiveTextIndex] = useState(0);
+  const [textDataList, setTextDataList] = useState([]);
 
-  const colors = ['black', 'red', 'blue', 'green', 'yellow'];
   const doubleClickThreshold = useRef(null);
   const openPenEditor = useRef(null);
+  const textInputRef = useRef(null);
+  const doubleClickThresholdText = useRef(null);
+  const [selectedTextId, setSelectedTextId] = useState(null);
+
+  const createNewTextData = () => ({
+    id: textDataList?.length + 1,
+    text: '',
+    color: 'black',
+    size: 16,
+    x: 0,
+    y: 0,
+  });
+
+  const addNewText = () => {
+    const newTextData = createNewTextData();
+    setTextDataList([...textDataList, newTextData]);
+    setActiveTextIndex(textDataList.length);
+    setTextMode(true);
+    setModalVisibleText(true);
+  };
+
+  const updateTextData = (index, updatedData) => {
+    const updatedTextDataList = textDataList.map((textData, i) =>
+      i === index ? { ...textData, ...updatedData } : textData,
+    );
+    setTextDataList(updatedTextDataList);
+  };
+
+  const handleDoubleClick = () => {
+    if (doubleClickThresholdText.current) {
+      clearTimeout(doubleClickThresholdText.current);
+      doubleClickThresholdText.current = null;
+      setModalVisibleText(true);
+    } else {
+      doubleClickThresholdText.current = setTimeout(() => {
+        doubleClickThresholdText.current = null;
+        if (textMode) {
+          setTextMode(false);
+        } else {
+          addNewText();
+          setTimeout(() => textInputRef.current.focus(), 100);
+        }
+      }, 300);
+    }
+  };
+
+  const doubleTapGesture = Gesture.Tap()
+    .numberOfTaps(2)
+    .onEnd(() => {
+      setZoomEnabled(!zoomEnabled);
+    })
+    .runOnJS(true);
 
   const panGesture = Gesture.Pan()
     .onUpdate(event => handleGesture(event))
@@ -47,7 +104,11 @@ const Home = () => {
     .onEnd(event => handlePinchHandlerStateChange(event))
     .runOnJS(true);
 
-  const composedGesture = Gesture.Simultaneous(panGesture, pinchGesture);
+  const composedGesture = Gesture.Simultaneous(
+    panGesture,
+    pinchGesture,
+    doubleTapGesture,
+  );
 
   const handleGesture = event => {
     const { x, y } = event;
@@ -76,7 +137,7 @@ const Home = () => {
   };
 
   const handlePinchGestureEvent = event => {
-    setPinchScale(event.scale);
+    setPinchScale(event?.scale);
     setDrawingEnabled(false);
   };
 
@@ -88,20 +149,19 @@ const Home = () => {
 
   const clearBoard = () => {
     setStrokes([]);
-  };
-
-  const undoLastStroke = () => {
-    setStrokes(strokes.slice(0, -1));
+    setTextDataList([]);
   };
 
   const handleUndoClick = () => {
     if (doubleClickThreshold.current) {
       clearTimeout(doubleClickThreshold.current);
       doubleClickThreshold.current = null;
-      undoLastStroke();
+      setStrokes(strokes.slice(0, -1));
     } else {
       doubleClickThreshold.current = setTimeout(() => {
         doubleClickThreshold.current = null;
+        setEraseMode(!eraseMode);
+        setDrawingEnabled(!drawingEnabled);
       }, 300);
     }
   };
@@ -118,11 +178,6 @@ const Home = () => {
         setEraseMode(false);
       }, 300);
     }
-  };
-
-  const toggleEraseMode = () => {
-    setEraseMode(!eraseMode);
-    setDrawingEnabled(!drawingEnabled);
   };
 
   const isPointInPath = (path, x, y) => {
@@ -147,174 +202,114 @@ const Home = () => {
       <StatusBar backgroundColor={'#EEE'} barStyle={'dark-content'} />
       <GestureHandlerRootView style={{ flex: 1, width: '100%' }}>
         <GestureDetector gesture={composedGesture}>
-          <Svg
+          <View
             style={{
               ...styles.drawingArea,
-              transform: [{ scale: baseScale * pinchScale }],
-            }}
-            onPress={() =>
-              setCurrentStroke({ path: '', color: penColor, width: penWidth })
-            }>
-            {strokes.map((stroke, index) => (
-              <Path
-                key={index}
-                d={stroke.path}
-                stroke={stroke.color}
-                strokeWidth={stroke.width}
-                fill="none"
+              transform: [
+                {
+                  scale: zoomEnabled
+                    ? zoomFactor * baseScale * pinchScale
+                    : baseScale * pinchScale,
+                },
+              ],
+            }}>
+            <Svg
+              onPress={() =>
+                setCurrentStroke({ path: '', color: penColor, width: penWidth })
+              }>
+              {strokes.map((stroke, index) => (
+                <Path
+                  key={index}
+                  d={stroke.path}
+                  stroke={stroke.color}
+                  strokeWidth={stroke.width}
+                  fill="none"
+                />
+              ))}
+              {currentStroke.path ? (
+                <Path
+                  d={currentStroke.path}
+                  stroke={currentStroke.color}
+                  strokeWidth={currentStroke.width}
+                  fill="none"
+                />
+              ) : null}
+            </Svg>
+            {textDataList.map(textData => (
+              <DraggableText
+                key={textData.id}
+                textData={textData}
+                textDataList={textDataList}
+                setTextDataList={setTextDataList}
+                isSelected={textData.id == selectedTextId}
+                onStartDrag={() => setSelectedTextId(() => textData.id)}
+                onEndDrag={() => setSelectedTextId(() => null)}
               />
             ))}
-            {currentStroke.path ? (
-              <Path
-                d={currentStroke.path}
-                stroke={currentStroke.color}
-                strokeWidth={currentStroke.width}
-                fill="none"
-              />
-            ) : null}
-          </Svg>
+          </View>
         </GestureDetector>
       </GestureHandlerRootView>
 
-      <View style={styles.buttonsContainer}>
-        <TouchableOpacity style={styles.button} onPress={togglePenEditor}>
-          {drawingEnabled ? (
-            <MaterialCommunityIcons name="pencil" size={26} color={'#000'} />
-          ) : (
-            <MaterialCommunityIcons
-              name="pencil-lock"
-              size={26}
-              color={'red'}
-            />
-          )}
+      <View style={styles.toolBar}>
+        <TouchableOpacity onPress={handleUndoClick}>
+          <MaterialCommunityIcons
+            name="undo"
+            size={24}
+            color={eraseMode ? 'red' : 'black'}
+          />
         </TouchableOpacity>
-
-        <TouchableOpacity style={styles.button} onPress={toggleEraseMode}>
-          {eraseMode ? (
-            <MaterialCommunityIcons name="eraser" size={26} color={'blue'} />
-          ) : (
-            <MaterialCommunityIcons name="eraser" size={26} color={'#000'} />
-          )}
+        <TouchableOpacity onPress={clearBoard}>
+          <MaterialCommunityIcons name="delete" size={24} color="black" />
         </TouchableOpacity>
-        <TouchableOpacity style={styles.button} onPress={handleUndoClick}>
-          <MaterialCommunityIcons name="undo" size={26} color={'#000'} />
+        <TouchableOpacity onPress={togglePenEditor}>
+          <MaterialCommunityIcons
+            name="pen"
+            size={24}
+            color={drawingEnabled ? 'black' : 'red'}
+          />
         </TouchableOpacity>
-        <TouchableOpacity style={styles.button} onPress={clearBoard}>
-          <Text style={styles.buttonText}>Clear</Text>
+        <TouchableOpacity onPress={addNewText} onLongPress={handleDoubleClick}>
+          <MaterialCommunityIcons name="format-text" size={24} color="black" />
         </TouchableOpacity>
       </View>
 
-      <Modal
-        animationType="fade"
-        transparent={true}
-        visible={modalVisible}
-        onRequestClose={() => setModalVisible(!modalVisible)}>
-        <View style={styles.modalView}>
-          <TouchableOpacity
-            style={styles.closeBtn}
-            onPress={() => setModalVisible(false)}>
-            <MaterialCommunityIcons name="close" size={24} color={'white'} />
-          </TouchableOpacity>
-          <Text
-            style={{
-              color: 'black',
-              marginVertical: 10,
-              fontWeight: '600',
-              textTransform: 'capitalize',
-            }}>
-            Pick Pen Colour: {penColor}
-          </Text>
-          <View style={styles.colorsBox}>
-            {colors.map(color => (
-              <TouchableOpacity
-                key={color}
-                style={{ ...styles.colorsStyle, backgroundColor: color }}
-                onPress={() => {
-                  setPenColor(color);
-                  setModalVisible(false);
-                }}></TouchableOpacity>
-            ))}
-          </View>
-          <Text
-            style={{ color: 'black', marginVertical: 10, fontWeight: '600' }}>
-            Pick Pen Width: {penWidth.toFixed(1)}
-          </Text>
-          <Slider
-            style={{ width: 200, height: 40, marginBottom: 20 }}
-            minimumValue={1}
-            maximumValue={10}
-            step={0.1}
-            value={penWidth}
-            onValueChange={value => setPenWidth(value)}
-            minimumTrackTintColor="#000000"
-            maximumTrackTintColor="#000000"
-          />
-        </View>
-      </Modal>
+      <PenModal
+        modalVisible={modalVisible}
+        setPenColor={setPenColor}
+        penWidth={penWidth}
+        setPenWidth={setPenWidth}
+        setModalVisible={setModalVisible}
+        penColor={penColor}
+      />
+
+      <TextModal
+        modalVisibleText={modalVisibleText}
+        setModalVisibleText={setModalVisibleText}
+        updateTextData={updateTextData}
+        textDataList={textDataList}
+        activeTextIndex={activeTextIndex}
+        textInputRef={textInputRef}
+      />
     </SafeAreaView>
   );
 };
 
-export default Home;
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
     backgroundColor: '#FFF',
   },
   drawingArea: {
-    width: '100%',
-    height: '100%',
+    flex: 1,
     backgroundColor: '#EEE',
   },
-  buttonsContainer: {
+  toolBar: {
+    height: 50,
     flexDirection: 'row',
     justifyContent: 'space-around',
-    width: '100%',
-    padding: 10,
-  },
-  button: {
-    backgroundColor: '#999',
-    padding: 10,
-  },
-  buttonText: {
-    color: 'white',
-    fontSize: 16,
-  },
-  modalView: {
-    margin: 20,
-    backgroundColor: 'white',
-    borderRadius: 10,
     alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 4,
-    elevation: 5,
-  },
-  closeBtn: {
-    height: 30,
-    width: 30,
-    backgroundColor: 'red',
-    justifyContent: 'center',
-    alignItems: 'center',
-    alignSelf: 'flex-end',
-    borderTopRightRadius: 10,
-    marginBottom: 20,
-  },
-  colorsStyle: {
-    height: 45,
-    width: 45,
-    marginHorizontal: 4,
-    borderRadius: 5,
-  },
-  colorsBox: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    backgroundColor: '#FFF',
   },
 });
+
+export default Home;
