@@ -48,7 +48,7 @@ function MyTabs() {
       />
     </Tab.Navigator>
   );
-}
+} 
 
 const Auth = () => {
   const Role = useSelector(state => state?.userReducer?.ConditionMAin);

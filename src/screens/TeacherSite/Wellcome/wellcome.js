@@ -14,7 +14,6 @@ import { PopingBold, PoppinsRegular } from '../../../utils/Fonts';
 const Wellcome = ({ navigation }) => {
   return (
     <SafeAreaView style={styles.main}>
-      <ScrollView contentContainerStyle={{ height: HEIGHT.height / 1 }}>
         <View style={styles.ImageDiv}>
           <FastImage
             style={styles.image}
@@ -40,7 +39,6 @@ const Wellcome = ({ navigation }) => {
             />
           </View>
         </View>
-      </ScrollView>
     </SafeAreaView>
   );
 };

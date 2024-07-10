@@ -14,7 +14,7 @@ import { PopingBold, PoppinsRegular } from '../../../utils/Fonts';
 const Studentwellcome = ({ navigation }) => {
   return (
     <SafeAreaView style={styles.main}>
-      <ScrollView contentContainerStyle={{ height: HEIGHT.height / 1 }}>
+      <ScrollView contentContainerStyle={{ height: HEIGHT.height * 1 }}>
         <View style={styles.ImageDiv}>
           <FastImage
             style={styles.image}
