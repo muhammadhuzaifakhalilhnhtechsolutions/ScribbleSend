@@ -8,6 +8,7 @@ import {
 } from 'react-native';
 import React from 'react';
 import Slider from '@react-native-community/slider';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
 const colors = ['black', 'red', 'blue', 'green', 'yellow'];
 
@@ -18,6 +19,8 @@ const TextModal = ({
   textDataList,
   activeTextIndex,
   textInputRef,
+  handleUpdateText,
+  selectedTextId,
 }) => {
   return (
     <Modal visible={modalVisibleText} animationType="slide" transparent={true}>
@@ -69,6 +72,38 @@ const TextModal = ({
             <Text style={styles.closeButtonText}>Close</Text>
           </TouchableOpacity>
         </View>
+        {/* <View style={styles.modalView}>
+          <TouchableOpacity
+            style={styles.closeBtn}
+            onPress={() => setModalVisibleText(false)}>
+            <MaterialCommunityIcons name="close" size={24} color={'white'} />
+          </TouchableOpacity>
+          <TextInput
+            style={styles.textInput}
+            placeholder="Update Text"
+            value={
+              textDataList.find(text => text.id === selectedTextId)?.text || ''
+            }
+            onChangeText={text => handleUpdateText({ text })}
+          />
+          <TextInput
+            style={styles.textInput}
+            placeholder="Update Font Size"
+            keyboardType="numeric"
+            value={String(
+              textDataList.find(text => text.id === selectedTextId)?.size || '',
+            )}
+            onChangeText={size => handleUpdateText({ size: parseFloat(size) })}
+          />
+          <TextInput
+            style={styles.textInput}
+            placeholder="Update Color"
+            value={
+              textDataList.find(text => text.id === selectedTextId)?.color || ''
+            }
+            onChangeText={color => handleUpdateText({ color })}
+          />
+        </View> */}
       </View>
     </Modal>
   );

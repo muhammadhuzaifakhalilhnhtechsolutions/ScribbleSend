@@ -49,8 +49,8 @@ const StudentDashboard = () => {
     text: '',
     color: 'black',
     size: 16,
-    x: 0,
-    y: 0,
+    x: 100,
+    y: 100,
   });
 
   const addNewText = () => {
@@ -197,6 +197,32 @@ const StudentDashboard = () => {
     return false;
   };
 
+  const handleSelectText = id => {
+    setSelectedTextId(id);
+  };
+
+  const handleDeleteText = () => {
+    setTextDataList(prevList =>
+      prevList.filter(text => text.id !== selectedTextId),
+    );
+    setSelectedTextId(null);
+  };
+
+  const handleEditText = () => {
+    setModalVisibleText(true);
+  };
+
+  const handleUpdateText = newTextData => {
+    const updatedTextDataList = textDataList.map(text => {
+      if (text.id === selectedTextId) {
+        return { ...text, ...newTextData };
+      }
+      return text;
+    });
+    setTextDataList(updatedTextDataList);
+    setModalVisibleText(false);
+  };
+
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar
@@ -246,8 +272,11 @@ const StudentDashboard = () => {
                 textDataList={textDataList}
                 setTextDataList={setTextDataList}
                 isSelected={textData.id == selectedTextId}
+                onSelectText={handleSelectText}
                 onStartDrag={() => setSelectedTextId(() => textData.id)}
                 onEndDrag={() => setSelectedTextId(() => null)}
+                handleEditText={handleEditText}
+                handleDeleteText={handleDeleteText}
               />
             ))}
           </View>
@@ -292,7 +321,10 @@ const StudentDashboard = () => {
         updateTextData={updateTextData}
         textDataList={textDataList}
         activeTextIndex={activeTextIndex}
+        selectedTextId={selectedTextId}
         textInputRef={textInputRef}
+        handleUpdateText={handleUpdateText}
+        setDrawingEnabled={setDrawingEnabled}
       />
     </SafeAreaView>
   );
@@ -301,10 +333,12 @@ const StudentDashboard = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    width: '100%',
     backgroundColor: '#FFF',
   },
   drawingArea: {
     flex: 1,
+    width: '100%',
     backgroundColor: '#EEE',
   },
   toolBar: {
@@ -312,7 +346,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-around',
     alignItems: 'center',
-    backgroundColor: '#FFF',
+    backgroundColor: 'gray',
   },
 });
 
