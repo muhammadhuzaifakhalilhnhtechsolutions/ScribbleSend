@@ -1,15 +1,9 @@
-export const ThemoColor = '#1973FF';
-export const White = '#fff';
+export const THEME_COLOR = '#1873FF';
+export const THEME_COLOR_LIGHT = '#d1e3ff';
+export const White = '#FFFFFF';
 export const Black = '#000000';
 export const LightGrey = '#F1F4FF';
-export const Grey = '#626262';
+export const Gray = '#626262';
 export const DarkGrey = '#494949';
 export const BottomGrey = '#CBD5E1';
-
-
-
-
-
-
-
-
+export const BG_COLOR = '#F3F5F8';

@@ -6,7 +6,7 @@ import {
   View,
 } from 'react-native';
 import React from 'react';
-import { Black, ThemoColor, White } from '../../utils/Color';
+import { Black, THEME_COLOR, White } from '../../utils/Color';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import FastImage from 'react-native-fast-image';
 import { PopingBold, PoppinsRegular } from '../../utils/Fonts';
@@ -15,7 +15,7 @@ import Button from '../../components/Button/Button';
 const Splash = ({ navigation }) => {
   return (
     <SafeAreaView style={styles.Main}>
-      <StatusBar backgroundColor={ThemoColor} hidden />
+      <StatusBar backgroundColor={THEME_COLOR} hidden />
 
       <ImageBackground
         style={styles.Backimg}
@@ -48,7 +48,7 @@ export default Splash;
 const styles = StyleSheet.create({
   Main: {
     flex: 1,
-    backgroundColor: ThemoColor,
+    backgroundColor: THEME_COLOR,
   },
   Backimg: {
     height: '100%',

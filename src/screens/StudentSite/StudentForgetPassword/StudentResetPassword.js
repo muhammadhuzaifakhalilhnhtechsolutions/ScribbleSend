@@ -16,9 +16,9 @@ import Input from '../../../components/TextInput/Input';
 import {
   Black,
   DarkGrey,
-  Grey,
+  Gray,
   LightGrey,
-  ThemoColor,
+  THEME_COLOR,
   White,
 } from '../../../utils/Color';
 import { PopingBold, PoppinsRegular } from '../../../utils/Fonts';
@@ -26,13 +26,19 @@ import { PopingBold, PoppinsRegular } from '../../../utils/Fonts';
 const StudentResetPassword = ({ navigation }) => {
   return (
     <SafeAreaView style={styles.main}>
-      <StatusBar backgroundColor={White} translucent hidden={true} />
-      <KeyboardAvoidingView
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
-        <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
-          <ImageBackground
-            style={styles.Backimg}
-            source={require('../../../assets/images/background.png')}>
+      <StatusBar backgroundColor={White} barStyle={'dark-content'} />
+      <ImageBackground
+        style={styles.Backimg}
+        source={require('../../../assets/images/background.png')}>
+        <KeyboardAvoidingView
+          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
+          <ScrollView
+            contentContainerStyle={{
+              flex: 1,
+              width: '100%',
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}>
             <Text style={styles.testwelcome}>Forgot Password?</Text>
             <Text style={styles.WllcomeText}>
               Enter a new password to reset the password on your account. We'll
@@ -41,14 +47,14 @@ const StudentResetPassword = ({ navigation }) => {
             <View style={styles.TextInputDiv}>
               <Input
                 placeholder={'Password'}
-                cursorColor={ThemoColor}
-                placeholderTextColor={Grey}
+                cursorColor={THEME_COLOR}
+                placeholderTextColor={Gray}
                 style={styles.textInput}
               />
               <Input
                 placeholder={'Confirm Password'}
-                cursorColor={ThemoColor}
-                placeholderTextColor={Grey}
+                cursorColor={THEME_COLOR}
+                placeholderTextColor={Gray}
                 style={styles.textInput}
               />
 
@@ -58,32 +64,32 @@ const StudentResetPassword = ({ navigation }) => {
                 style={styles.SigninButton}
               />
             </View>
-          </ImageBackground>
-        </ScrollView>
-      </KeyboardAvoidingView>
+          </ScrollView>
+        </KeyboardAvoidingView>
+      </ImageBackground>
     </SafeAreaView>
   );
 };
 
 export default StudentResetPassword;
-const HEIGHT = Dimensions.get('screen');
+
 const styles = StyleSheet.create({
   main: {
     flex: 1,
     backgroundColor: White,
-    justifyContent: 'center',
-  },
-  Backimg: {
-    height: '100%',
     width: '100%',
   },
-
+  Backimg: {
+    flex: 1,
+    width: '100%',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
   testwelcome: {
     fontFamily: PopingBold,
-    color: ThemoColor,
+    color: THEME_COLOR,
     fontSize: 25,
     textAlign: 'center',
-    marginTop: 50,
   },
   WllcomeText: {
     fontFamily: PoppinsRegular,
@@ -97,6 +103,7 @@ const styles = StyleSheet.create({
     marginVertical: 20,
     alignItems: 'center',
     justifyContent: 'center',
+    width: '100%',
   },
   textInput: {
     width: '100%',
@@ -110,7 +117,7 @@ const styles = StyleSheet.create({
   Forgettext: {
     textAlign: 'right',
     width: '95%',
-    color: ThemoColor,
+    color: THEME_COLOR,
     fontFamily: PopingBold,
     fontSize: 13,
     marginVertical: 15,
@@ -118,7 +125,7 @@ const styles = StyleSheet.create({
   SigninButton: {
     width: '95%',
     marginVertical: 15,
-    shadowColor: ThemoColor,
+    shadowColor: THEME_COLOR,
     shadowOffset: {
       width: 0,
       height: 2,
@@ -145,7 +152,7 @@ const styles = StyleSheet.create({
   },
   ContinueText: {
     textAlign: 'center',
-    color: ThemoColor,
+    color: THEME_COLOR,
   },
   SocialCard: {
     marginVertical: 10,

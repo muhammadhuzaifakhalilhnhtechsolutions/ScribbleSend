@@ -1,40 +1,40 @@
 import React from 'react';
 import {
-    Dimensions,
-    ImageBackground,
-    KeyboardAvoidingView,
-    Platform,
-    SafeAreaView,
-    ScrollView,
-    StatusBar,
-    StyleSheet,
-    Text,
-    TouchableOpacity,
-    View,
+  Dimensions,
+  ImageBackground,
+  KeyboardAvoidingView,
+  Platform,
+  SafeAreaView,
+  ScrollView,
+  StatusBar,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
 } from 'react-native';
 import FastImage from 'react-native-fast-image';
 import Button from '../../../components/Button/Button';
 import Input from '../../../components/TextInput/Input';
 import {
-    Black,
-    DarkGrey,
-    Grey,
-    LightGrey,
-    ThemoColor,
-    White,
+  Black,
+  DarkGrey,
+  Gray,
+  LightGrey,
+  THEME_COLOR,
+  White,
 } from '../../../utils/Color';
 import { PopingBold, PoppinsRegular } from '../../../utils/Fonts';
 
 const Login = ({ navigation }) => {
   return (
     <SafeAreaView style={styles.main}>
-      <StatusBar backgroundColor={White} translucent hidden={true} />
-      <KeyboardAvoidingView
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
-        <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
-          <ImageBackground
-            style={styles.Backimg}
-            source={require('../../../assets/images/background.png')}>
+      <StatusBar backgroundColor={White} barStyle={'dark-content'} />
+      <ImageBackground
+        style={styles.Backimg}
+        source={require('../../../assets/images/background.png')}>
+        <KeyboardAvoidingView
+          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
+          <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
             <Text style={styles.testwelcome}>Login here</Text>
             <Text style={styles.WllcomeText}>
               Welcome back you’ve {'\n'}
@@ -43,13 +43,13 @@ const Login = ({ navigation }) => {
             <View style={styles.TextInputDiv}>
               <Input
                 placeholder={'Email'}
-                placeholderTextColor={Grey}
+                placeholderTextColor={Gray}
                 style={styles.textInput}
               />
               <Input
                 placeholder={'Password'}
-                cursorColor={ThemoColor}
-                placeholderTextColor={Grey}
+                cursorColor={THEME_COLOR}
+                placeholderTextColor={Gray}
                 style={styles.textInput}
               />
               <View style={styles.ForgerPassDiv}>
@@ -81,9 +81,9 @@ const Login = ({ navigation }) => {
                 <Text style={styles.TextGoogle}>Login With Google</Text>
               </TouchableOpacity>
             </View>
-          </ImageBackground>
-        </ScrollView>
-      </KeyboardAvoidingView>
+          </ScrollView>
+        </KeyboardAvoidingView>
+      </ImageBackground>
     </SafeAreaView>
   );
 };
@@ -94,15 +94,15 @@ const styles = StyleSheet.create({
   main: {
     flex: 1,
     backgroundColor: White,
-  },
-  Backimg: {
-    height: '100%',
     width: '100%',
   },
-
+  Backimg: {
+    flex: 1,
+    width: '100%',
+  },
   testwelcome: {
     fontFamily: PopingBold,
-    color: ThemoColor,
+    color: THEME_COLOR,
     fontSize: 25,
     textAlign: 'center',
     marginTop: 50,
@@ -131,7 +131,7 @@ const styles = StyleSheet.create({
   Forgettext: {
     textAlign: 'right',
     width: '95%',
-    color: ThemoColor,
+    color: THEME_COLOR,
     fontFamily: PopingBold,
     fontSize: 13,
     marginVertical: 15,
@@ -139,7 +139,7 @@ const styles = StyleSheet.create({
   SigninButton: {
     width: '95%',
     marginVertical: 15,
-    shadowColor: ThemoColor,
+    shadowColor: THEME_COLOR,
     shadowOffset: {
       width: 0,
       height: 2,
@@ -166,7 +166,7 @@ const styles = StyleSheet.create({
   },
   ContinueText: {
     textAlign: 'center',
-    color: ThemoColor,
+    color: THEME_COLOR,
   },
   SocialCard: {
     marginVertical: 10,

@@ -225,11 +225,7 @@ const StudentDashboard = () => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <StatusBar
-        backgroundColor={'#EEE'}
-        barStyle={'dark-content'}
-        hidden={false}
-      />
+      <StatusBar backgroundColor={'#EEE'} barStyle={'dark-content'} />
       <GestureHandlerRootView style={{ flex: 1, width: '100%' }}>
         <GestureDetector gesture={composedGesture}>
           <View

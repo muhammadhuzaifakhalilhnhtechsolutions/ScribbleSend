@@ -1,28 +1,24 @@
 import React, { useState } from 'react';
 import {
-    Dimensions,
-    ImageBackground,
-    KeyboardAvoidingView,
-    Platform,
-    SafeAreaView,
-    ScrollView,
-    StatusBar,
-    StyleSheet,
-    Text,
-    View
+  Dimensions,
+  ImageBackground,
+  KeyboardAvoidingView,
+  Platform,
+  SafeAreaView,
+  ScrollView,
+  StatusBar,
+  StyleSheet,
+  Text,
+  View,
 } from 'react-native';
 import {
-    CodeField,
-    Cursor,
-    useBlurOnFulfill,
-    useClearByFocusCell,
+  CodeField,
+  Cursor,
+  useBlurOnFulfill,
+  useClearByFocusCell,
 } from 'react-native-confirmation-code-field';
 import Button from '../../../components/Button/Button';
-import {
-    Black,
-    ThemoColor,
-    White
-} from '../../../utils/Color';
+import { Black, THEME_COLOR, White } from '../../../utils/Color';
 import { PopingBold, PoppinsRegular } from '../../../utils/Fonts';
 const { height, width } = Dimensions.get('screen');
 const Otp = ({ navigation, props }) => {
@@ -36,13 +32,13 @@ const Otp = ({ navigation, props }) => {
 
   return (
     <SafeAreaView style={styles.main}>
-      <StatusBar backgroundColor={White} translucent hidden={true} />
-      <KeyboardAvoidingView
-        behavior={Platform.OS === 'ios' ? 'padding' : 'padding'}>
-        <ScrollView>
-          <ImageBackground
-            style={styles.Backimg}
-            source={require('../../../assets/images/background.png')}>
+      <StatusBar backgroundColor={White} barStyle={'dark-content'} />
+      <ImageBackground
+        style={styles.Backimg}
+        source={require('../../../assets/images/background.png')}>
+        <KeyboardAvoidingView
+          behavior={Platform.OS === 'ios' ? 'padding' : 'padding'}>
+          <ScrollView>
             <Text style={styles.testwelcome}>OTP Verification</Text>
             <Text style={styles.WllcomeText}>
               Enter the security code sent to your email
@@ -75,15 +71,15 @@ const Otp = ({ navigation, props }) => {
                 style={styles.SigninButton}
               />
             </View>
-          </ImageBackground>
-        </ScrollView>
-      </KeyboardAvoidingView>
+          </ScrollView>
+        </KeyboardAvoidingView>
+      </ImageBackground>
     </SafeAreaView>
   );
 };
 
 export default Otp;
-const HEIGHT = Dimensions.get('screen');
+
 const styles = StyleSheet.create({
   main: {
     flex: 1,
@@ -91,19 +87,16 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   Backimg: {
-    height: '100%',
+    flex: 1,
     width: '100%',
     justifyContent: 'center',
   },
-
   testwelcome: {
     fontFamily: PopingBold,
-    color: ThemoColor,
+    color: THEME_COLOR,
     fontSize: 25,
     textAlign: 'center',
-    marginTop: 50,
   },
-
   WllcomeText: {
     fontFamily: PoppinsRegular,
     color: Black,
@@ -111,7 +104,6 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginVertical: 20,
   },
-  WllcomeTexts: {},
   cell: {
     width: 45,
     height: 45,
@@ -124,11 +116,10 @@ const styles = StyleSheet.create({
     textAlignVertical: 'center',
     overflow: 'hidden',
   },
-  focusCell:{
-    borderWidth:1,
-    borderColor:ThemoColor
+  focusCell: {
+    borderWidth: 1,
+    borderColor: THEME_COLOR,
   },
-
   underlineStyleBase: {
     width: '100%',
     alignItems: 'center',
@@ -141,18 +132,16 @@ const styles = StyleSheet.create({
   underlineStyleHighLighted: {
     borderColor: '#03DAC6',
   },
-
   SigninButton: {
     width: '80%',
     marginVertical: 15,
-    shadowColor: ThemoColor,
+    shadowColor: THEME_COLOR,
     shadowOffset: {
       width: 0,
       height: 2,
     },
     shadowOpacity: 0.25,
     shadowRadius: 3.84,
-
     elevation: 5,
   },
 });

@@ -8,9 +8,9 @@ import {
 } from 'react-native';
 import React from 'react';
 import Slider from '@react-native-community/slider';
-import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import { Black, Gray, THEME_COLOR, White } from '../../utils/Color';
 
-const colors = ['black', 'red', 'blue', 'green', 'yellow'];
+const colors = [Black, 'red', 'blue', 'green', 'yellow'];
 
 const TextModal = ({
   modalVisibleText,
@@ -27,7 +27,7 @@ const TextModal = ({
       <View style={styles.modalContainer}>
         <View style={styles.modalContent}>
           <Text style={styles.modalTitle}>Text Settings</Text>
-          <Text style={{ color: 'black', textAlign: 'center' }}>
+          <Text style={styles.textStyle}>
             Text Size: {textDataList[activeTextIndex]?.color}
           </Text>
           <View style={styles.colorContainer}>
@@ -45,7 +45,7 @@ const TextModal = ({
             ))}
           </View>
           <View style={styles.sliderContainer}>
-            <Text style={{ color: 'black', textAlign: 'center' }}>
+            <Text style={styles.textStyle}>
               Text Size: {textDataList[activeTextIndex]?.size?.toFixed(0)}
             </Text>
             <Slider
@@ -59,51 +59,23 @@ const TextModal = ({
             />
           </View>
           <TextInput
+            placeholder="write text here..."
+            placeholderTextColor={Gray}
             ref={textInputRef}
             style={styles.textInput}
             value={textDataList[activeTextIndex]?.text}
             onChangeText={text => updateTextData(activeTextIndex, { text })}
-            autoFocus
-            multiline
+            autoFocus={true}
+            multiline={true}
+            cursorColor={THEME_COLOR}
+            selectionColor={THEME_COLOR}
           />
           <TouchableOpacity
             onPress={() => setModalVisibleText(false)}
             style={styles.closeButton}>
-            <Text style={styles.closeButtonText}>Close</Text>
+            <Text style={styles.closeButtonText}>Add Text</Text>
           </TouchableOpacity>
         </View>
-        {/* <View style={styles.modalView}>
-          <TouchableOpacity
-            style={styles.closeBtn}
-            onPress={() => setModalVisibleText(false)}>
-            <MaterialCommunityIcons name="close" size={24} color={'white'} />
-          </TouchableOpacity>
-          <TextInput
-            style={styles.textInput}
-            placeholder="Update Text"
-            value={
-              textDataList.find(text => text.id === selectedTextId)?.text || ''
-            }
-            onChangeText={text => handleUpdateText({ text })}
-          />
-          <TextInput
-            style={styles.textInput}
-            placeholder="Update Font Size"
-            keyboardType="numeric"
-            value={String(
-              textDataList.find(text => text.id === selectedTextId)?.size || '',
-            )}
-            onChangeText={size => handleUpdateText({ size: parseFloat(size) })}
-          />
-          <TextInput
-            style={styles.textInput}
-            placeholder="Update Color"
-            value={
-              textDataList.find(text => text.id === selectedTextId)?.color || ''
-            }
-            onChangeText={color => handleUpdateText({ color })}
-          />
-        </View> */}
       </View>
     </Modal>
   );
@@ -122,6 +94,7 @@ const PenModal = ({
       <View style={styles.modalContainer}>
         <View style={styles.modalContent}>
           <Text style={styles.modalTitle}>Pen Settings</Text>
+          <Text style={styles.textStyle}>Pen Colour: {penColor}</Text>
           <View style={styles.colorContainer}>
             {colors.map((color, index) => (
               <TouchableOpacity
@@ -136,7 +109,9 @@ const PenModal = ({
             ))}
           </View>
           <View style={styles.sliderContainer}>
-            <Text>Pen Width: {penWidth?.toFixed(0)}</Text>
+            <Text style={styles.textStyle}>
+              Pen Width: {penWidth?.toFixed(0)}
+            </Text>
             <Slider
               style={styles.slider}
               minimumValue={1}
@@ -148,7 +123,7 @@ const PenModal = ({
           <TouchableOpacity
             onPress={() => setModalVisible(false)}
             style={styles.closeButton}>
-            <Text style={styles.closeButtonText}>Close</Text>
+            <Text style={styles.closeButtonText}>Done</Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -167,7 +142,7 @@ const styles = StyleSheet.create({
   },
   modalContent: {
     width: '80%',
-    backgroundColor: '#FFF',
+    backgroundColor: White,
     borderRadius: 10,
     padding: 20,
     alignItems: 'center',
@@ -176,7 +151,7 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: 'bold',
     marginBottom: 20,
-    color: 'black',
+    color: Black,
   },
   colorContainer: {
     flexDirection: 'row',
@@ -190,7 +165,7 @@ const styles = StyleSheet.create({
   },
   selectedColorOption: {
     borderWidth: 2,
-    borderColor: '#000',
+    borderColor: Black,
   },
   sliderContainer: {
     width: '100%',
@@ -206,7 +181,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
   },
   closeButtonText: {
-    color: '#FFF',
+    color: White,
     fontWeight: 'bold',
   },
   textInput: {
@@ -217,12 +192,13 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     paddingHorizontal: 10,
     marginBottom: 20,
-    color: 'black',
+    color: Black,
   },
   textContainer: {
     padding: 10,
     backgroundColor: 'transparent',
     borderWidth: 1,
-    borderColor: 'gray',
+    borderColor: Gray,
   },
+  textStyle: { color: Black, textAlign: 'center', marginBottom: 10 },
 });

@@ -15,9 +15,9 @@ import React from 'react';
 import {
   Black,
   DarkGrey,
-  Grey,
+  Gray,
   LightGrey,
-  ThemoColor,
+  THEME_COLOR,
   White,
 } from '../../../utils/Color';
 import { PopingBold, PoppinsRegular } from '../../../utils/Fonts';
@@ -28,13 +28,13 @@ import FastImage from 'react-native-fast-image';
 const StudentSignUp = ({ navigation }) => {
   return (
     <SafeAreaView style={styles.main}>
-      <StatusBar backgroundColor={White} translucent hidden={true} />
-      <KeyboardAvoidingView
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
-        <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
-          <ImageBackground
-            style={styles.Backimg}
-            source={require('../../../assets/images/background.png')}>
+      <StatusBar backgroundColor={White} barStyle={'dark-content'} />
+      <ImageBackground
+        style={styles.Backimg}
+        source={require('../../../assets/images/background.png')}>
+        <KeyboardAvoidingView
+          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
+          <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
             <Text style={styles.testwelcome}>Create Account</Text>
             <Text style={styles.WllcomeText}>
               Create an account so you can explore all the {'\n'}existing jobs
@@ -42,20 +42,20 @@ const StudentSignUp = ({ navigation }) => {
             <View style={styles.TextInputDiv}>
               <Input
                 placeholder={'Email'}
-                placeholderTextColor={Grey}
+                placeholderTextColor={Gray}
                 style={styles.textInput}
-                cursorColor={ThemoColor}
+                cursorColor={THEME_COLOR}
               />
               <Input
                 placeholder={'Password'}
-                cursorColor={ThemoColor}
-                placeholderTextColor={Grey}
+                cursorColor={THEME_COLOR}
+                placeholderTextColor={Gray}
                 style={styles.textInput}
               />
               <Input
                 placeholder={'Confrim Password'}
-                cursorColor={ThemoColor}
-                placeholderTextColor={Grey}
+                cursorColor={THEME_COLOR}
+                placeholderTextColor={Gray}
                 style={styles.textInput}
               />
               <Button title={'Sign Up'} style={styles.SigninButton} />
@@ -76,9 +76,9 @@ const StudentSignUp = ({ navigation }) => {
                 <Text style={styles.TextGoogle}>SignUp With Google</Text>
               </TouchableOpacity>
             </View>
-          </ImageBackground>
-        </ScrollView>
-      </KeyboardAvoidingView>
+          </ScrollView>
+        </KeyboardAvoidingView>
+      </ImageBackground>
     </SafeAreaView>
   );
 };
@@ -89,15 +89,15 @@ const styles = StyleSheet.create({
   main: {
     flex: 1,
     backgroundColor: White,
-  },
-  Backimg: {
-    height: '100%',
     width: '100%',
   },
-
+  Backimg: {
+    flex: 1,
+    width: '100%',
+  },
   testwelcome: {
     fontFamily: PopingBold,
-    color: ThemoColor,
+    color: THEME_COLOR,
     fontSize: 25,
     textAlign: 'center',
     marginTop: 50,
@@ -123,7 +123,7 @@ const styles = StyleSheet.create({
   Forgettext: {
     textAlign: 'right',
     width: '95%',
-    color: ThemoColor,
+    color: THEME_COLOR,
     fontFamily: PopingBold,
     fontSize: 13,
     marginVertical: 15,
@@ -131,7 +131,7 @@ const styles = StyleSheet.create({
   SigninButton: {
     width: '95%',
     marginVertical: 15,
-    shadowColor: ThemoColor,
+    shadowColor: THEME_COLOR,
     shadowOffset: {
       width: 0,
       height: 2,
@@ -158,7 +158,7 @@ const styles = StyleSheet.create({
   },
   ContinueText: {
     textAlign: 'center',
-    color: ThemoColor,
+    color: THEME_COLOR,
   },
   SocialCard: {
     marginVertical: 10,
