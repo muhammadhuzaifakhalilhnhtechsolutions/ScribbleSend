@@ -1,0 +1,21 @@
+current directory: /Users/mac/Desktop/MuhammadHuzaifa/ScribbleSend/vendor/bundle/ruby/3.2.0/gems/strscan-3.1.0/ext/strscan
+/Users/mac/.rvm/rubies/ruby-3.2.2/bin/ruby extconf.rb
+checking for onig_region_memsize() in ruby.h... yes
+checking for rb_reg_onig_match() in ruby.h... no
+creating Makefile
+
+current directory: /Users/mac/Desktop/MuhammadHuzaifa/ScribbleSend/vendor/bundle/ruby/3.2.0/gems/strscan-3.1.0/ext/strscan
+make DESTDIR\= sitearchdir\=./.gem.20240718-28193-8ew6z3 sitelibdir\=./.gem.20240718-28193-8ew6z3 clean
+
+current directory: /Users/mac/Desktop/MuhammadHuzaifa/ScribbleSend/vendor/bundle/ruby/3.2.0/gems/strscan-3.1.0/ext/strscan
+make DESTDIR\= sitearchdir\=./.gem.20240718-28193-8ew6z3 sitelibdir\=./.gem.20240718-28193-8ew6z3
+compiling strscan.c
+linking shared-object strscan.bundle
+ld: warning: ignoring duplicate libraries: '-lruby.3.2'
+
+current directory: /Users/mac/Desktop/MuhammadHuzaifa/ScribbleSend/vendor/bundle/ruby/3.2.0/gems/strscan-3.1.0/ext/strscan
+make DESTDIR\= sitearchdir\=./.gem.20240718-28193-8ew6z3 sitelibdir\=./.gem.20240718-28193-8ew6z3 install
+/usr/local/opt/coreutils/bin/ginstall -c -m 0755 strscan.bundle ./.gem.20240718-28193-8ew6z3
+
+current directory: /Users/mac/Desktop/MuhammadHuzaifa/ScribbleSend/vendor/bundle/ruby/3.2.0/gems/strscan-3.1.0/ext/strscan
+make DESTDIR\= sitearchdir\=./.gem.20240718-28193-8ew6z3 sitelibdir\=./.gem.20240718-28193-8ew6z3 clean

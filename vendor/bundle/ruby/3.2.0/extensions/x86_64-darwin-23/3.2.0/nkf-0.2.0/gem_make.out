@@ -1,0 +1,19 @@
+current directory: /Users/mac/Desktop/MuhammadHuzaifa/ScribbleSend/vendor/bundle/ruby/3.2.0/gems/nkf-0.2.0/ext/nkf
+/Users/mac/.rvm/rubies/ruby-3.2.2/bin/ruby extconf.rb
+creating Makefile
+
+current directory: /Users/mac/Desktop/MuhammadHuzaifa/ScribbleSend/vendor/bundle/ruby/3.2.0/gems/nkf-0.2.0/ext/nkf
+make DESTDIR\= sitearchdir\=./.gem.20240718-28193-mlas55 sitelibdir\=./.gem.20240718-28193-mlas55 clean
+
+current directory: /Users/mac/Desktop/MuhammadHuzaifa/ScribbleSend/vendor/bundle/ruby/3.2.0/gems/nkf-0.2.0/ext/nkf
+make DESTDIR\= sitearchdir\=./.gem.20240718-28193-mlas55 sitelibdir\=./.gem.20240718-28193-mlas55
+compiling nkf.c
+linking shared-object nkf.bundle
+ld: warning: ignoring duplicate libraries: '-lruby.3.2'
+
+current directory: /Users/mac/Desktop/MuhammadHuzaifa/ScribbleSend/vendor/bundle/ruby/3.2.0/gems/nkf-0.2.0/ext/nkf
+make DESTDIR\= sitearchdir\=./.gem.20240718-28193-mlas55 sitelibdir\=./.gem.20240718-28193-mlas55 install
+/usr/local/opt/coreutils/bin/ginstall -c -m 0755 nkf.bundle ./.gem.20240718-28193-mlas55
+
+current directory: /Users/mac/Desktop/MuhammadHuzaifa/ScribbleSend/vendor/bundle/ruby/3.2.0/gems/nkf-0.2.0/ext/nkf
+make DESTDIR\= sitearchdir\=./.gem.20240718-28193-mlas55 sitelibdir\=./.gem.20240718-28193-mlas55 clean
