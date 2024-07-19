@@ -19,13 +19,17 @@ const TextModal = ({
   textDataList,
   activeTextIndex,
   textInputRef,
-  handleUpdateText,
-  selectedTextId,
 }) => {
   return (
     <Modal visible={modalVisibleText} animationType="slide" transparent={true}>
       <View style={styles.modalContainer}>
         <View style={styles.modalContent}>
+          <TouchableOpacity
+            style={styles.closeBtnDiv}
+            onPress={() => setModalVisibleText(false)}>
+            <Text style={{ color: White }}>X</Text>
+          </TouchableOpacity>
+
           <Text style={styles.modalTitle}>Text Settings</Text>
           <Text style={styles.textStyle}>
             Text Size: {textDataList[activeTextIndex]?.color}
@@ -93,6 +97,12 @@ const PenModal = ({
     <Modal visible={modalVisible} animationType="slide" transparent={true}>
       <View style={styles.modalContainer}>
         <View style={styles.modalContent}>
+          <TouchableOpacity
+            style={styles.closeBtnDiv}
+            onPress={() => setModalVisible(false)}>
+            <Text style={{ color: White }}>X</Text>
+          </TouchableOpacity>
+
           <Text style={styles.modalTitle}>Pen Settings</Text>
           <Text style={styles.textStyle}>Pen Colour: {penColor}</Text>
           <View style={styles.colorContainer}>
@@ -201,4 +211,15 @@ const styles = StyleSheet.create({
     borderColor: Gray,
   },
   textStyle: { color: Black, textAlign: 'center', marginBottom: 10 },
+  closeBtnDiv: {
+    backgroundColor: 'red',
+    position: 'absolute',
+    top: 10,
+    right: 10,
+    borderRadius: 360,
+    height: 25,
+    width: 25,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
 });

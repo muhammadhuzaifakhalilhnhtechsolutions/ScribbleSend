@@ -23,7 +23,7 @@ import StudentLogin from '../screens/StudentSite/StudentLogin/StudentLogin';
 import StudentSignUp from '../screens/StudentSite/StudentSignUp/StudentSignUp';
 import StudentEmail from '../screens/StudentSite/StudentForgetPassword/StudentEmail';
 import StudentOtp from '../screens/StudentSite/StudentForgetPassword/StudentOtp';
-import StudentDashboard from '../screens/StudentSite/StudentDasboard/StudentDasboard';
+import WhiteBoard from '../screens/StudentSite/WhiteBoard/WhiteBoard';
 import StudentHome from '../screens/StudentSite/StudentHome/StudentHome';
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -103,9 +103,9 @@ const Auth = () => {
         component={Wellcome}
       />
       <Stack.Screen
-        name="StudentDashboard"
+        name="WhiteBoard"
         options={{ headerShown: false }}
-        component={StudentDashboard}
+        component={WhiteBoard}
       />
       <Stack.Screen
         name="StudentHome"

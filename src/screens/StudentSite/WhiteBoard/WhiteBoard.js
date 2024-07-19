@@ -2,10 +2,12 @@ import React, { useState, useRef } from 'react';
 import {
   SafeAreaView,
   StyleSheet,
-  Text,
   View,
   TouchableOpacity,
   StatusBar,
+  PermissionsAndroid,
+  Platform,
+  ToastAndroid,
 } from 'react-native';
 import Svg, { Path } from 'react-native-svg';
 import {
@@ -14,10 +16,15 @@ import {
   Gesture,
 } from 'react-native-gesture-handler';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import Fontisto from 'react-native-vector-icons/Fontisto';
 import DraggableText from '../../../components/DragableText/DragableText';
 import { PenModal, TextModal } from '../../../components/Modals/Modals';
+import RecordScreen, { RecordingResult } from 'react-native-record-screen';
+import RNFS from 'react-native-fs';
+import { PERMISSIONS, RESULTS } from 'react-native-permissions';
+import moment from 'moment';
 
-const StudentDashboard = () => {
+const WhiteBoard = () => {
   const [currentStroke, setCurrentStroke] = useState({
     path: '',
     color: 'black',
@@ -37,12 +44,14 @@ const StudentDashboard = () => {
   const [modalVisibleText, setModalVisibleText] = useState(false);
   const [activeTextIndex, setActiveTextIndex] = useState(0);
   const [textDataList, setTextDataList] = useState([]);
+  const [isRecording, setisRecording] = useState(false);
+  const [selectedTextId, setSelectedTextId] = useState(null);
 
   const doubleClickThreshold = useRef(null);
   const openPenEditor = useRef(null);
   const textInputRef = useRef(null);
   const doubleClickThresholdText = useRef(null);
-  const [selectedTextId, setSelectedTextId] = useState(null);
+  const mobileVersion = Platform.constants['Release'];
 
   const createNewTextData = () => ({
     id: textDataList?.length + 1,
@@ -223,9 +232,101 @@ const StudentDashboard = () => {
     setModalVisibleText(false);
   };
 
+  const requestPermissions = async () => {
+    if (Platform.OS === 'android') {
+      await requestAndroidPermissions();
+    } else {
+      const statuses = await request(
+        PERMISSIONS.IOS.PHOTO_LIBRARY,
+        PERMISSIONS.IOS.MICROPHONE,
+      );
+      if (
+        statuses[PERMISSIONS.IOS.PHOTO_LIBRARY] === RESULTS.GRANTED &&
+        statuses[PERMISSIONS.IOS.MICROPHONE] === RESULTS.GRANTED
+      ) {
+        console.log('All permissions granted');
+        startRecording();
+      } else {
+        console.log('Permissions denied');
+      }
+    }
+  };
+
+  const requestPermissionsArray = [
+    PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE,
+    PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,
+    PermissionsAndroid.PERMISSIONS.RECORD_AUDIO,
+    'android.permission.POST_NOTIFICATIONS',
+  ];
+
+  const requestPermissionsAbove = [PermissionsAndroid.PERMISSIONS.RECORD_AUDIO];
+
+  const requestAndroidPermissions = async () => {
+    try {
+      const granted = await PermissionsAndroid.requestMultiple(
+        mobileVersion >= 13 ? requestPermissionsAbove : requestPermissionsArray,
+      );
+      console.log('Permissions granted ==>', granted);
+      if (
+        mobileVersion >= 13
+          ? granted['android.permission.RECORD_AUDIO'] ===
+            PermissionsAndroid.RESULTS.GRANTED
+          : (granted['android.permission.READ_EXTERNAL_STORAGE'] ===
+              PermissionsAndroid.RESULTS.GRANTED &&
+              granted['android.permission.WRITE_EXTERNAL_STORAGE'] ===
+                PermissionsAndroid.RESULTS.GRANTED &&
+              granted['android.permission.RECORD_AUDIO'] ===
+                PermissionsAndroid.RESULTS.GRANTED) ||
+            granted['android.permission.POST_NOTIFICATIONS'] ===
+              PermissionsAndroid.RESULTS.GRANTED
+      ) {
+        console.log('All permissions granted');
+        startRecording();
+      } else {
+        console.log('Permissions denied');
+      }
+    } catch (err) {
+      console.log('err permissions', err);
+    }
+  };
+
+  const startRecording = async () => {
+    try {
+      const res = await RecordScreen.startRecording();
+      if (res === RecordingResult.Started) {
+        setisRecording(true);
+      }
+      console.log('startRecording....>', res);
+    } catch (err) {
+      console.error('Error starting recording:', err);
+    }
+  };
+
+  const stopRecording = async () => {
+    try {
+      const res = await RecordScreen.stopRecording();
+      if (res?.status === 'success') {
+        const destinationPath = `${
+          RNFS.DownloadDirectoryPath
+        }/recorded_video${moment().format('YYYY_MM_DD_HH_MM_SS')}.mp4`;
+        await RNFS.moveFile(res.result.outputURL, destinationPath);
+        setisRecording(false);
+        ToastAndroid.show(
+          'Recording saved successfully !',
+          ToastAndroid.BOTTOM,
+        );
+        console.log('stopRecording');
+      } else {
+        setisRecording(false);
+      }
+    } catch (err) {
+      console.error('Error stopping recording:', err);
+    }
+  };
+
   return (
     <SafeAreaView style={styles.container}>
-      <StatusBar backgroundColor={'#EEE'} barStyle={'dark-content'} />
+      <StatusBar backgroundColor={'#EEEEEE'} barStyle={'dark-content'} />
       <GestureHandlerRootView style={{ flex: 1, width: '100%' }}>
         <GestureDetector gesture={composedGesture}>
           <View
@@ -297,6 +398,16 @@ const StudentDashboard = () => {
             color={drawingEnabled ? 'black' : 'red'}
           />
         </TouchableOpacity>
+        <TouchableOpacity
+          onPress={() => {
+            isRecording ? stopRecording() : requestPermissions();
+          }}>
+          <Fontisto
+            name={isRecording ? 'stop' : 'record'}
+            size={20}
+            color={'red'}
+          />
+        </TouchableOpacity>
         <TouchableOpacity onPress={addNewText} onLongPress={handleDoubleClick}>
           <MaterialCommunityIcons name="format-text" size={24} color="black" />
         </TouchableOpacity>
@@ -346,4 +457,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default StudentDashboard;
+export default WhiteBoard;
