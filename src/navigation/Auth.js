@@ -25,6 +25,10 @@ import StudentEmail from '../screens/StudentSite/StudentForgetPassword/StudentEm
 import StudentOtp from '../screens/StudentSite/StudentForgetPassword/StudentOtp';
 import WhiteBoard from '../screens/StudentSite/WhiteBoard/WhiteBoard';
 import StudentHome from '../screens/StudentSite/StudentHome/StudentHome';
+import Dasboard from '../screens/TeacherSite/Dasboard/Dasboard';
+import ViewAssessment from '../screens/TeacherSite/ViewAssessment/ViewAssessment';
+import TeacherNotification from '../screens/TeacherSite/Notification/TeacherNotification';
+import StudentNotification from '../screens/StudentSite/Notification/StudentNotification';
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
 
@@ -112,6 +116,11 @@ const Auth = () => {
         options={{ headerShown: false }}
         component={StudentHome}
       />
+      <Stack.Screen
+        name="StudentNotification"
+        options={{ headerShown: false }}
+        component={StudentNotification}
+      />
 
       {/* Teacher Auth */}
       <Stack.Screen
@@ -125,10 +134,15 @@ const Auth = () => {
         component={SignUp}
       />
       <Stack.Screen
+        name="Dasboard"
+        options={{ headerShown: false }}
+        component={Dasboard}
+      />
+      {/* <Stack.Screen
         name="ScribbleBottom"
         options={{ headerShown: false }}
         component={ScribbleBottom}
-      />
+      /> */}
 
       <Stack.Screen
         name="Email"
@@ -144,6 +158,16 @@ const Auth = () => {
         name="ResetPassword"
         options={{ headerShown: false }}
         component={ResetPassword}
+      />
+      <Stack.Screen
+        name="ViewAssessment"
+        options={{ headerShown: false }}
+        component={ViewAssessment}
+      />
+      <Stack.Screen
+        name="TeacherNotification"
+        options={{ headerShown: false }}
+        component={TeacherNotification}
       />
     </Stack.Navigator>
   );

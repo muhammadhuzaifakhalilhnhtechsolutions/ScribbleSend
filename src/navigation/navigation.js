@@ -77,11 +77,11 @@ const MainNavigation = () => {
         options={{ headerShown: false }}
         component={SignUp}
       />
-      <Stack.Screen
+      {/* <Stack.Screen
         name="ScribbleBottom"
         options={{ headerShown: false }}
         component={ScribbleBottom}
-      />
+      /> */}
       <Stack.Screen
         name="Email"
         options={{ headerShown: false }}

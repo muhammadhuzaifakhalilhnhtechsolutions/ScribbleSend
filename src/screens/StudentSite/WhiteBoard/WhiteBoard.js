@@ -8,6 +8,8 @@ import {
   PermissionsAndroid,
   Platform,
   ToastAndroid,
+  Alert,
+  Dimensions,
 } from 'react-native';
 import Svg, { Path } from 'react-native-svg';
 import {
@@ -23,6 +25,14 @@ import RecordScreen, { RecordingResult } from 'react-native-record-screen';
 import RNFS from 'react-native-fs';
 import { PERMISSIONS, RESULTS } from 'react-native-permissions';
 import moment from 'moment';
+
+import { captureRef } from 'react-native-view-shot';
+import { PageSizes, PDFDocument } from 'pdf-lib';
+import { encode } from 'base64-arraybuffer';
+import Share from 'react-native-share';
+import Loader from '../../../components/Loader/Loader';
+
+const { height, width } = Dimensions.get('screen');
 
 const WhiteBoard = () => {
   const [currentStroke, setCurrentStroke] = useState({
@@ -46,12 +56,20 @@ const WhiteBoard = () => {
   const [textDataList, setTextDataList] = useState([]);
   const [isRecording, setisRecording] = useState(false);
   const [selectedTextId, setSelectedTextId] = useState(null);
+  const [shareLoading, setshareLoading] = useState(false);
+  const [panOffset, setPanOffset] = useState({ x: 0, y: 0 });
+  const [drawingAreaSize, setDrawingAreaSize] = useState({
+    width: width,
+    height: height,
+  });
 
   const doubleClickThreshold = useRef(null);
   const openPenEditor = useRef(null);
   const textInputRef = useRef(null);
   const doubleClickThresholdText = useRef(null);
+  const svgRef = useRef(null);
   const mobileVersion = Platform.constants['Release'];
+  const panMultiplier = 0.5;
 
   const createNewTextData = () => ({
     id: textDataList?.length + 1,
@@ -113,10 +131,28 @@ const WhiteBoard = () => {
     .onEnd(event => handlePinchHandlerStateChange(event))
     .runOnJS(true);
 
+  const infiniteSheetGesture = Gesture.Pan()
+    .minPointers(2)
+    .onUpdate(event => {
+      const newOffsetX = panOffset.x + event.translationX * panMultiplier;
+      const newOffsetY = panOffset.y + event.translationY * panMultiplier;
+      setPanOffset({ x: newOffsetX, y: newOffsetY });
+
+      setDrawingAreaSize(prevSize => ({
+        width: Math.max(prevSize.width + newOffsetX),
+        height: Math.max(prevSize.height + newOffsetY),
+      }));
+    })
+    .onEnd(event => {
+      setPanOffset(panOffset);
+    })
+    .runOnJS(true);
+
   const composedGesture = Gesture.Simultaneous(
     panGesture,
     pinchGesture,
     doubleTapGesture,
+    infiniteSheetGesture,
   );
 
   const handleGesture = event => {
@@ -324,15 +360,83 @@ const WhiteBoard = () => {
     }
   };
 
+  const convertSvgToPdf = async () => {
+    setshareLoading(true);
+    try {
+      if (svgRef.current) {
+        const filePath = await captureRef(svgRef.current, {
+          format: 'png',
+          quality: 1.0,
+        });
+        const pdfDoc = await PDFDocument.create();
+        const pngImageBytes = await fetch(filePath).then(res =>
+          res.arrayBuffer(),
+        );
+        const pngImage = await pdfDoc.embedPng(pngImageBytes);
+        const pngDims = pngImage.scale(1);
+        const page = pdfDoc.addPage([pngDims.width, pngDims.height]);
+
+        page.drawImage(pngImage, {
+          x: 0,
+          y: 0,
+          width: pngDims.width,
+          height: pngDims.height,
+          opacity: 1,
+        });
+
+        const pdfBytes = await pdfDoc.save();
+        const pdfBase64 = encode(pdfBytes);
+        const uniqueFilename = `scribble_send_${moment().format(
+          'YYYYMMDD_HHmmss',
+        )}.pdf`;
+        const downloadPath = `${RNFS.DownloadDirectoryPath}/${uniqueFilename}`;
+        await RNFS.writeFile(downloadPath, pdfBase64, 'base64');
+
+        await Share.open({
+          url: `file://${downloadPath}`,
+          type: 'application/pdf',
+        })
+          .then(res => {
+            setshareLoading(false);
+          })
+          .catch(err => {
+            Alert.alert(
+              'Success',
+              `PDF doesn't share but saved successfully in Downloads as ${uniqueFilename}!`,
+            );
+            setshareLoading(false);
+          });
+      } else {
+        setshareLoading(false);
+      }
+    } catch (error) {
+      setshareLoading(false);
+      console.log('Error creating PDF:', error);
+    }
+  };
+
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar backgroundColor={'#EEEEEE'} barStyle={'dark-content'} />
+      {shareLoading && <Loader />}
       <GestureHandlerRootView style={{ flex: 1, width: '100%' }}>
         <GestureDetector gesture={composedGesture}>
           <View
             style={{
-              ...styles.drawingArea,
+              // ...styles.drawingArea,
+              width: drawingAreaSize.width,
+              height: drawingAreaSize.height,
+              backgroundColor: '#EEE',
+              // transform: [
+              //   {
+              //     scale: zoomEnabled
+              //       ? zoomFactor * baseScale * pinchScale
+              //       : baseScale * pinchScale,
+              //   },
+              // ],
               transform: [
+                { translateX: panOffset.x },
+                { translateY: panOffset.y },
                 {
                   scale: zoomEnabled
                     ? zoomFactor * baseScale * pinchScale
@@ -341,6 +445,8 @@ const WhiteBoard = () => {
               ],
             }}>
             <Svg
+              ref={svgRef}
+              xmlns="http://www.w3.org/2000/svg"
               onPress={() =>
                 setCurrentStroke({ path: '', color: penColor, width: penWidth })
               }>
@@ -410,6 +516,9 @@ const WhiteBoard = () => {
         </TouchableOpacity>
         <TouchableOpacity onPress={addNewText} onLongPress={handleDoubleClick}>
           <MaterialCommunityIcons name="format-text" size={24} color="black" />
+        </TouchableOpacity>
+        <TouchableOpacity onPress={convertSvgToPdf}>
+          <MaterialCommunityIcons name="share" size={24} color="black" />
         </TouchableOpacity>
       </View>
 

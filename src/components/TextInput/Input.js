@@ -17,12 +17,13 @@ import {
 import { PoppinsRegular } from '../../utils/Fonts';
 
 const Input = ({
-  placeholder,
-  placeholderTextColor,
+  placeholder = 'Placeholder',
+  placeholderTextColor = '#64748B',
   onChangeText,
   value,
   style,
-  cursorColor,
+  numberOfLines = 1,
+  multiline,
 }) => {
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
   const isPassword = placeholder.toLowerCase().includes('password');
@@ -39,9 +40,11 @@ const Input = ({
         onChangeText={onChangeText}
         cursorColor={THEME_COLOR}
         value={value}
+        numberOfLines={numberOfLines}
+        multiline={multiline}
         secureTextEntry={isPassword && !isPasswordVisible}
         style={[
-          { ...styles.inputstyles, paddingRight: isPassword && 40 },
+          { ...styles.inputstyles, paddingRight: isPassword ? 40 : 0 },
           style,
         ]}
       />

@@ -4,15 +4,20 @@ import { THEME_COLOR, White } from '../../utils/Color';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { PopingBold } from '../../utils/Fonts';
 
-const Header = ({ icon, title }) => {
+const Header = ({ icon, title, onPress }) => {
   return (
     <View style={styles.container}>
       {icon && (
-        <TouchableOpacity style={styles.backBtnDiv}>
+        <TouchableOpacity style={styles.backBtnDiv} onPress={onPress}>
           <Ionicons name="chevron-back" size={24} color={White} />
         </TouchableOpacity>
       )}
-      <View style={{ ...styles.divTitle, width: icon ? '90%' : '100%' }}>
+      <View
+        style={{
+          ...styles.divTitle,
+          width: icon ? '90%' : '100%',
+          right: icon ? 10 : 0,
+        }}>
         <Text style={styles.title}>{title}</Text>
       </View>
     </View>
@@ -47,5 +52,6 @@ const styles = StyleSheet.create({
     color: White,
     fontSize: 18,
     fontFamily: PopingBold,
+    textAlign: 'center',
   },
 });
