@@ -10,6 +10,7 @@ import {
   ToastAndroid,
   Alert,
   Dimensions,
+  ScrollView,
 } from 'react-native';
 import Svg, { Path } from 'react-native-svg';
 import {
@@ -27,7 +28,7 @@ import { PERMISSIONS, RESULTS } from 'react-native-permissions';
 import moment from 'moment';
 
 import { captureRef } from 'react-native-view-shot';
-import { PageSizes, PDFDocument } from 'pdf-lib';
+import { PDFDocument, scale } from 'pdf-lib';
 import { encode } from 'base64-arraybuffer';
 import Share from 'react-native-share';
 import Loader from '../../../components/Loader/Loader';
@@ -62,6 +63,7 @@ const WhiteBoard = () => {
     width: width,
     height: height,
   });
+  const panMultiplier = 0.5;
 
   const doubleClickThreshold = useRef(null);
   const openPenEditor = useRef(null);
@@ -69,7 +71,8 @@ const WhiteBoard = () => {
   const doubleClickThresholdText = useRef(null);
   const svgRef = useRef(null);
   const mobileVersion = Platform.constants['Release'];
-  const panMultiplier = 0.5;
+
+  console.log(drawingAreaSize);
 
   const createNewTextData = () => ({
     id: textDataList?.length + 1,
@@ -114,14 +117,20 @@ const WhiteBoard = () => {
   };
 
   const doubleTapGesture = Gesture.Tap()
-    .numberOfTaps(2)
+    .numberOfTaps(3)
     .onEnd(() => {
       setZoomEnabled(!zoomEnabled);
     })
     .runOnJS(true);
 
   const panGesture = Gesture.Pan()
-    .onUpdate(event => handleGesture(event))
+    .onUpdate(event => {
+      if (event.numberOfPointers === 2) {
+        handlePanGesture(event);
+      } else {
+        handleGesture(event);
+      }
+    })
     .onBegin(event => handleStart(event))
     .onEnd(event => handleEnd(event))
     .runOnJS(true);
@@ -131,28 +140,10 @@ const WhiteBoard = () => {
     .onEnd(event => handlePinchHandlerStateChange(event))
     .runOnJS(true);
 
-  const infiniteSheetGesture = Gesture.Pan()
-    .minPointers(2)
-    .onUpdate(event => {
-      const newOffsetX = panOffset.x + event.translationX * panMultiplier;
-      const newOffsetY = panOffset.y + event.translationY * panMultiplier;
-      setPanOffset({ x: newOffsetX, y: newOffsetY });
-
-      setDrawingAreaSize(prevSize => ({
-        width: Math.max(prevSize.width + newOffsetX),
-        height: Math.max(prevSize.height + newOffsetY),
-      }));
-    })
-    .onEnd(event => {
-      setPanOffset(panOffset);
-    })
-    .runOnJS(true);
-
   const composedGesture = Gesture.Simultaneous(
     panGesture,
     pinchGesture,
     doubleTapGesture,
-    infiniteSheetGesture,
   );
 
   const handleGesture = event => {
@@ -170,11 +161,27 @@ const WhiteBoard = () => {
     }
   };
 
+  const handlePanGesture = event => {
+    setDrawingEnabled(false);
+    const { translationX, translationY } = event;
+    setPanOffset(prev => ({
+      x: prev.x,
+      y: prev.y + (translationY / 2) * panMultiplier,
+      // x: prev.x + (translationX / 4) * panMultiplier,
+      // y: prev.y + (translationY * panMultiplier) / 2,
+    }));
+    setDrawingAreaSize(prev => ({
+      width: prev.width,
+      height: prev.height - translationY * panMultiplier,
+    }));
+  };
+
   const handleStart = () => {
     setCurrentStroke({ path: '', color: penColor, width: penWidth });
   };
 
   const handleEnd = () => {
+    setDrawingEnabled(true);
     if (currentStroke.path) {
       setStrokes([...strokes, currentStroke]);
       setCurrentStroke({ path: '', color: penColor, width: penWidth });
@@ -423,17 +430,9 @@ const WhiteBoard = () => {
         <GestureDetector gesture={composedGesture}>
           <View
             style={{
-              // ...styles.drawingArea,
               width: drawingAreaSize.width,
               height: drawingAreaSize.height,
               backgroundColor: '#EEE',
-              // transform: [
-              //   {
-              //     scale: zoomEnabled
-              //       ? zoomFactor * baseScale * pinchScale
-              //       : baseScale * pinchScale,
-              //   },
-              // ],
               transform: [
                 { translateX: panOffset.x },
                 { translateY: panOffset.y },
@@ -448,7 +447,11 @@ const WhiteBoard = () => {
               ref={svgRef}
               xmlns="http://www.w3.org/2000/svg"
               onPress={() =>
-                setCurrentStroke({ path: '', color: penColor, width: penWidth })
+                setCurrentStroke({
+                  path: '',
+                  color: penColor,
+                  width: penWidth,
+                })
               }>
               {strokes.map((stroke, index) => (
                 <Path
@@ -468,6 +471,7 @@ const WhiteBoard = () => {
                 />
               ) : null}
             </Svg>
+
             {textDataList.map(textData => (
               <DraggableText
                 key={textData.id}
@@ -489,7 +493,7 @@ const WhiteBoard = () => {
       <View style={styles.toolBar}>
         <TouchableOpacity onPress={handleUndoClick}>
           <MaterialCommunityIcons
-            name="undo"
+            name="eraser"
             size={24}
             color={eraseMode ? 'red' : 'black'}
           />
