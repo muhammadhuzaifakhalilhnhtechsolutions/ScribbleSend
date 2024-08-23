@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import {
   SafeAreaView,
   StyleSheet,
@@ -41,8 +41,6 @@ const { height, width } = Dimensions.get('screen');
 
 const WhiteBoard = ({ navigation, route }) => {
   const AllData = route.params?.data;
-  const currIndex = route.params?.index;
-  const currQues = route.params?.item;
   const [currentStroke, setCurrentStroke] = useState({
     path: '',
     color: 'black',
@@ -68,6 +66,8 @@ const WhiteBoard = ({ navigation, route }) => {
   const [panOffset, setPanOffset] = useState({ x: 0, y: 0 });
   const questions = AllData?.questions;
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
+  const [drawings, setDrawings] = useState({});
+  const [textDrawings, setTextDrawings] = useState({});
   const [drawingAreaSize, setDrawingAreaSize] = useState({
     width: width,
     height: height,
@@ -81,16 +81,47 @@ const WhiteBoard = ({ navigation, route }) => {
   const svgRef = useRef(null);
   const mobileVersion = Platform.constants['Release'];
 
+  useEffect(() => {
+    loadDrawingForCurrentQuestion();
+  }, [currentQuestionIndex]);
+
   const handleNext = () => {
+    saveCurrentDrawing();
     if (currentQuestionIndex < questions?.length - 1) {
       setCurrentQuestionIndex(currentQuestionIndex + 1);
     }
   };
 
   const handlePrevious = () => {
+    saveCurrentDrawing();
     if (currentQuestionIndex > 0) {
       setCurrentQuestionIndex(currentQuestionIndex - 1);
     }
+  };
+
+  const saveCurrentDrawing = () => {
+    const drawingData = {
+      strokes: strokes,
+      textDataList: textDataList,
+    };
+
+    setDrawings(prevDrawings => ({
+      ...prevDrawings,
+      [currentQuestionIndex]: drawingData.strokes,
+    }));
+
+    setTextDrawings(prevTextDrawings => ({
+      ...prevTextDrawings,
+      [currentQuestionIndex]: drawingData.textDataList,
+    }));
+  };
+
+  const loadDrawingForCurrentQuestion = () => {
+    const savedDrawingData = drawings[currentQuestionIndex] || [];
+    const savedTextData = textDrawings[currentQuestionIndex] || [];
+
+    setStrokes(savedDrawingData);
+    setTextDataList(savedTextData);
   };
 
   const createNewTextData = () => ({
@@ -373,6 +404,16 @@ const WhiteBoard = ({ navigation, route }) => {
         }/recorded_video${moment().format('YYYY_MM_DD_HH_MM_SS')}.mp4`;
         await RNFS.moveFile(res.result.outputURL, destinationPath);
         setisRecording(false);
+        await Share.open({
+          url: `file://${destinationPath}`,
+          type: 'video/mp4',
+        })
+          .then(res => {
+            setshareLoading(false);
+          })
+          .catch(err => {
+            setshareLoading(false);
+          });
         ToastAndroid.show(
           'Recording saved successfully !',
           ToastAndroid.BOTTOM,
@@ -447,9 +488,11 @@ const WhiteBoard = ({ navigation, route }) => {
       {shareLoading && <Loader />}
       <View style={styles.topHeader}>
         <Text numberOfLines={1} style={styles.worksheetText}>
-          {moment(currQues?.created_at).format('DD-MM-YY') +
+          {moment(questions[currentQuestionIndex]?.created_at).format(
+            'DD-MM-YY',
+          ) +
             ' ' +
-            currQues?.question_text}
+            questions[currentQuestionIndex]?.question_text}
         </Text>
         <Text style={styles.totalQues}>
           {currentQuestionIndex + 1} / {questions?.length}
