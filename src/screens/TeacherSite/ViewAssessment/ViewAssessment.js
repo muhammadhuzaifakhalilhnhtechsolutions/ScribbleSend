@@ -53,7 +53,7 @@ const ViewAssessment = ({ navigation }) => {
       />
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
-        <ScrollView showsVerticalScrollIndicator={false} scrollEnabled>
+        <ScrollView showsVerticalScrollIndicator={false} nestedScrollEnabled>
           <View style={styles.pdfViewSec}>
             <PDFViewer
               pdfUrl={

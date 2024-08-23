@@ -10,13 +10,11 @@ import { Black, THEME_COLOR, White } from '../../utils/Color';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import FastImage from 'react-native-fast-image';
 import { PopingBold, PoppinsRegular } from '../../utils/Fonts';
-import Button from '../../components/Button/Button';
 
 const Splash = ({ navigation }) => {
   return (
     <SafeAreaView style={styles.Main}>
-      <StatusBar backgroundColor={THEME_COLOR} hidden />
-
+      <StatusBar backgroundColor={THEME_COLOR} barStyle={'light-content'} />
       <ImageBackground
         style={styles.Backimg}
         source={require('../../assets/images/background.png')}>
@@ -29,14 +27,6 @@ const Splash = ({ navigation }) => {
         </View>
         <View style={styles.TextView}>
           <Text style={styles.testwelcome}>Hello and {'\n'}welcome here!</Text>
-          <View style={styles.bittondiv}>
-            {/* <Button
-              onPress={() => navigation.navigate('UserType')}
-              title={'Let’s Start'}
-              style={styles.button}
-              textStyle={styles.text}
-            /> */}
-          </View>
         </View>
       </ImageBackground>
     </SafeAreaView>

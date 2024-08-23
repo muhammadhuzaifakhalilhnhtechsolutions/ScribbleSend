@@ -10,7 +10,7 @@ import {
 } from '../utils/Color';
 import { PopingBold } from '../utils/Fonts';
 
-const ScribbleBottom = ({
+const TeacherBottom = ({
   descriptors,
   customStyles,
   state,
@@ -29,7 +29,7 @@ const ScribbleBottom = ({
           backgroundColor: state.index == 0 ? THEME_COLOR_LIGHT : White,
         }}
         onPress={() => {
-          navigation.navigate('StudentHome');
+          navigation.navigate('Dashboard');
         }}>
         <Icon
           name="home"
@@ -50,7 +50,7 @@ const ScribbleBottom = ({
           backgroundColor: state.index == 1 ? THEME_COLOR_LIGHT : White,
         }}
         onPress={() => {
-          navigation.navigate('StudentSettings');
+          navigation.navigate('Setting');
         }}>
         <Icon
           name="settings"
@@ -69,7 +69,7 @@ const ScribbleBottom = ({
   );
 };
 
-export default ScribbleBottom;
+export default TeacherBottom;
 
 const styles = StyleSheet.create({
   conatiner: {

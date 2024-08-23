@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   Dimensions,
   ImageBackground,
@@ -13,20 +13,24 @@ import {
 } from 'react-native';
 import Button from '../../../components/Button/Button';
 import Input from '../../../components/TextInput/Input';
-import {
-  Black,
-  DarkGrey,
-  Gray,
-  LightGrey,
-  THEME_COLOR,
-  White,
-} from '../../../utils/Color';
+import { Black, Gray, THEME_COLOR, White } from '../../../utils/Color';
 import { PopingBold, PoppinsRegular } from '../../../utils/Fonts';
+import { PostApiWithOutToken } from '../../../api/helper';
+import { BaseUrl } from '../../../api/BaseUrl';
+import { Formik } from 'formik';
+import { ForgotEmail } from '../../../Schema/Schemas';
+import BackHeader from '../../../components/ShortHeader/ShortHeader';
+import Loader from '../../../components/Loader/Loader';
+import { showMessage } from 'react-native-flash-message';
 
 const StudentEmail = ({ navigation }) => {
+  const [isLoading, setisLoading] = useState(false);
+
   return (
     <SafeAreaView style={styles.main}>
       <StatusBar backgroundColor={White} barStyle={'dark-content'} />
+      <BackHeader onPress={() => navigation.goBack()} />
+      {isLoading && <Loader />}
       <ImageBackground
         style={styles.Backimg}
         source={require('../../../assets/images/background.png')}>
@@ -44,20 +48,91 @@ const StudentEmail = ({ navigation }) => {
               Don’t worry! it happens. Please enter email address associated
               with your account
             </Text>
-            <View style={styles.TextInputDiv}>
-              <Input
-                placeholder={'Email'}
-                placeholderTextColor={Gray}
-                style={styles.TextInput}
-                cursorColor={THEME_COLOR}
-              />
+            <Formik
+              initialValues={{ email: '' }}
+              validationSchema={ForgotEmail}
+              onSubmit={values => {
+                setisLoading(true);
+                const userEmail = values.email?.toLocaleLowerCase()?.trim();
 
-              <Button
-                onPress={() => navigation.navigate('StudentOtp')}
-                title={'Confrim Email'}
-                style={styles.SigninButton}
-              />
-            </View>
+                const formdata = new FormData();
+                formdata.append('email', userEmail);
+
+                PostApiWithOutToken(`${BaseUrl}/api/student/forget`, formdata)
+                  .then(res => {
+                    console.log('res forgot===>', res?.data);
+                    if (res?.data?.status) {
+                      setisLoading(false);
+                      navigation.navigate('StudentOtp', { email: userEmail });
+                      showMessage({
+                        message: 'Success',
+                        description: res?.data?.response,
+                        type: 'success',
+                        floating: true,
+                        animated: true,
+                      });
+                    } else {
+                      setisLoading(false);
+                      showMessage({
+                        message: 'Failed',
+                        description: res.data?.error,
+                        type: 'danger',
+                        animated: true,
+                        floating: true,
+                      });
+                    }
+                  })
+                  .catch(error => {
+                    console.log('err forgot===>', error);
+                    setisLoading(false);
+                    const errorKeys =
+                      error && Object.keys(error?.response?.data?.errors);
+                    if (errorKeys?.length > 0) {
+                      errorKeys.forEach(key => {
+                        error?.response?.data?.errors[key]?.forEach(
+                          errorMsg => {
+                            showMessage({
+                              message: 'Failed',
+                              description: errorMsg,
+                              type: 'danger',
+                              animated: true,
+                              floating: true,
+                            });
+                          },
+                        );
+                      });
+                    }
+                  });
+              }}>
+              {({
+                handleChange,
+                handleBlur,
+                handleSubmit,
+                values,
+                errors,
+                touched,
+              }) => (
+                <View style={styles.TextInputDiv}>
+                  <Input
+                    placeholder={'Email'}
+                    placeholderTextColor={Gray}
+                    style={styles.TextInput}
+                    cursorColor={THEME_COLOR}
+                    value={values.email}
+                    onChangeText={handleChange('email')}
+                    onBlur={handleBlur('email')}
+                  />
+                  {touched.email && errors.email ? (
+                    <Text style={styles.validation}>{errors.email}</Text>
+                  ) : null}
+                  <Button
+                    onPress={handleSubmit}
+                    title={'Confirm Email'}
+                    style={styles.SigninButton}
+                  />
+                </View>
+              )}
+            </Formik>
           </ScrollView>
         </KeyboardAvoidingView>
       </ImageBackground>
@@ -116,5 +191,13 @@ const styles = StyleSheet.create({
     shadowRadius: 3.84,
 
     elevation: 5,
+  },
+  validation: {
+    color: 'red',
+    paddingLeft: 10,
+    textAlign: 'left',
+    width: '100%',
+    fontFamily: PoppinsRegular,
+    marginTop: -14,
   },
 });

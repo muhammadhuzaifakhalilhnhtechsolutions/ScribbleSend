@@ -1,100 +1,86 @@
-import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import React from 'react';
+import StudentNotification from '../screens/StudentSite/Notification/StudentNotification';
+import StudentHome from '../screens/StudentSite/StudentHome/StudentHome';
+import WhiteBoard from '../screens/StudentSite/WhiteBoard/WhiteBoard';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import Icon from 'react-native-vector-icons/Ionicons';
-import UserType from '../screens/UserType/UserType';
-import Studentwellcome from '../screens/StudentSite/StudentWellcome/StudentWellcome';
-import StudentLogin from '../screens/StudentSite/StudentLogin/StudentLogin';
-import StudentSignUp from '../screens/StudentSite/StudentSignUp/StudentSignUp';
-import StudentEmail from '../screens/StudentSite/StudentForgetPassword/StudentEmail';
-import StudentOtp from '../screens/StudentSite/StudentForgetPassword/StudentOtp';
-import StudentResetPassword from '../screens/StudentSite/StudentForgetPassword/StudentResetPassword';
-import Home from '../screens/Home/Home';
+import ScribbleBottom from './ScribbleBottom';
+import QuestionList from '../screens/StudentSite/QuestionList/QuestionList';
+import StudentSettings from '../screens/StudentSite/StudentSettings/StudentSettings';
+import StudentEditProfile from '../screens/StudentSite/StudentEditProfile/StudentEditProfile';
+import StudentChangePassword from '../screens/StudentSite/StudentChangePass/StudentChangePassword';
+import StudentTerms from '../screens/StudentSite/StudentTerms/StudentTerms';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
 
-function MyTabs() {
+const MyTabs = () => {
   return (
-    <Tab.Navigator>
+    <Tab.Navigator tabBar={props => <ScribbleBottom {...props} />}>
       <Tab.Screen
-        name="Home"
-        component={Home}
+        name="StudentHome"
+        component={StudentHome}
         options={{
           headerShown: false,
-          tabBarIcon: ({ color }) => {
-            return <Icon name={'home-outline'} size={25} color={color} />;
+          tabBarIcon: ({ focused, color, size }) => {
+            return <Icon name={'home'} size={25} color={color} />;
           },
         }}
       />
       <Tab.Screen
-        name="Profile"
-        component={Profile}
+        name="StudentSettings"
+        component={StudentSettings}
         options={{
           headerShown: false,
-          tabBarIcon: ({ color }) => {
-            return <Icon name={'finger-print-sharp'} size={25} color={color} />;
+          tabBarIcon: ({ focused, color, size }) => {
+            return <Icon name={'settings'} size={25} color={color} />;
           },
         }}
       />
     </Tab.Navigator>
   );
-}
+};
 
 const StudentNavigation = () => {
   return (
     <Stack.Navigator
-      initialRouteName="Studentwellcome"
+      initialRouteName="HomeBase"
       screenOptions={{ headerShown: false }}>
-      {/* <Stack.Screen
-          name="HomeBase"
-          options={{ headerShown: false }}
-          component={MyTabs}
-        /> */}
-      {/* add your another screen here using -> Stack.Screen */}
-      {/* <Stack.Screen
-          name="HomeBase"
-          options={{ headerShown: false }}
-          component={Home}
-        /> */}
-
       <Stack.Screen
-        name="Studentwellcome"
+        name="HomeBase"
         options={{ headerShown: false }}
-        component={Studentwellcome}
-      />
-
-      <Stack.Screen
-        name="StudentLogin"
-        options={{ headerShown: false }}
-        component={StudentLogin}
+        component={MyTabs}
       />
       <Stack.Screen
-        name="StudentSignUp"
+        name="WhiteBoard"
         options={{ headerShown: false }}
-        component={StudentSignUp}
-      />
-
-      <Stack.Screen
-        name="StudentEmail"
-        options={{ headerShown: false }}
-        component={StudentEmail}
+        component={WhiteBoard}
       />
       <Stack.Screen
-        name="StudentOtp"
+        name="StudentNotification"
         options={{ headerShown: false }}
-        component={StudentOtp}
+        component={StudentNotification}
       />
       <Stack.Screen
-        name="StudentResetPassword"
+        name="QuestionList"
         options={{ headerShown: false }}
-        component={StudentResetPassword}
+        component={QuestionList}
       />
       <Stack.Screen
-        name="home"
+        name="StudentEditProfile"
         options={{ headerShown: false }}
-        component={Home}
+        component={StudentEditProfile}
+      />
+      <Stack.Screen
+        name="StudentChangePassword"
+        options={{ headerShown: false }}
+        component={StudentChangePassword}
+      />
+      <Stack.Screen
+        name="StudentTerms"
+        options={{ headerShown: false }}
+        component={StudentTerms}
       />
     </Stack.Navigator>
   );

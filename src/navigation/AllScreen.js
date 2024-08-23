@@ -1,15 +1,15 @@
-import React, { useState } from 'react';
+import React from 'react';
 import MainNavigation from './navigation';
 import { useSelector } from 'react-redux';
 import StudentNavigation from './StudentNavigation';
 import Auth from './Auth';
 
 const AllScreens = () => {
-  const Role = 'Student';
-  const token = false;
+  const role = useSelector(state => state.userReducer?.user?.data?.role);
+  const token = useSelector(state => state.userReducer?.user?.data?.token);
 
   return token ? (
-    Role == 'Student' ? (
+    role == 'student' ? (
       <StudentNavigation />
     ) : (
       <MainNavigation />

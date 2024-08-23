@@ -1,6 +1,5 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
-  Dimensions,
   ImageBackground,
   KeyboardAvoidingView,
   Platform,
@@ -22,11 +21,21 @@ import {
   White,
 } from '../../../utils/Color';
 import { PopingBold, PoppinsRegular } from '../../../utils/Fonts';
+import { Formik } from 'formik';
+import { ResetPassword } from '../../../Schema/Schemas';
+import Loader from '../../../components/Loader/Loader';
+import { PostApiWithOutToken } from '../../../api/helper';
+import { CommonActions } from '@react-navigation/native';
+import { showMessage } from 'react-native-flash-message';
+import { BaseUrl } from '../../../api/BaseUrl';
 
-const StudentResetPassword = ({ navigation }) => {
+const StudentResetPassword = ({ navigation, route }) => {
+  const [isLoading, setisLoading] = useState(false);
+
   return (
     <SafeAreaView style={styles.main}>
       <StatusBar backgroundColor={White} barStyle={'dark-content'} />
+      {isLoading && <Loader />}
       <ImageBackground
         style={styles.Backimg}
         source={require('../../../assets/images/background.png')}>
@@ -44,26 +53,108 @@ const StudentResetPassword = ({ navigation }) => {
               Enter a new password to reset the password on your account. We'll
               ask for this password whenever you log in.
             </Text>
-            <View style={styles.TextInputDiv}>
-              <Input
-                placeholder={'Password'}
-                cursorColor={THEME_COLOR}
-                placeholderTextColor={Gray}
-                style={styles.textInput}
-              />
-              <Input
-                placeholder={'Confirm Password'}
-                cursorColor={THEME_COLOR}
-                placeholderTextColor={Gray}
-                style={styles.textInput}
-              />
+            <Formik
+              initialValues={{ new_password: '', confrimPassword: '' }}
+              validationSchema={ResetPassword}
+              onSubmit={values => {
+                setisLoading(true);
+                // console.log('values', values);
+                const formdata = new FormData();
+                formdata.append('token', route?.params);
+                formdata.append('password', values.new_password);
+                formdata.append(
+                  'password_confirmation',
+                  values.confrimPassword,
+                );
 
-              <Button
-                onPress={() => navigation.navigate('StudentLogin')}
-                title={'Confrim Email'}
-                style={styles.SigninButton}
-              />
-            </View>
+                PostApiWithOutToken(
+                  `${BaseUrl}/api/student/reset_password`,
+                  formdata,
+                )
+                  .then(res => {
+                    console.log('res reset==>', res.data);
+                    if (res.data?.status) {
+                      setisLoading(false);
+                      navigation.dispatch(
+                        CommonActions.reset({
+                          index: 1,
+                          routes: [{ name: 'StudentLogin' }],
+                        }),
+                      );
+                      showMessage({
+                        message: 'Success',
+                        description: 'Password reset successfully',
+                        type: 'success',
+                        floating: true,
+                        animated: true,
+                      });
+                    } else {
+                      setisLoading(false);
+                      showMessage({
+                        message: 'Failed',
+                        description: res.data?.error,
+                        type: 'danger',
+                        floating: true,
+                        animated: true,
+                      });
+                    }
+                  })
+                  .catch(error => {
+                    console.log('error reset==>', error.response?.data);
+                    setisLoading(false);
+                    showMessage({
+                      message: 'Failed',
+                      description: 'Something went wrong!',
+                      type: 'danger',
+                      floating: true,
+                      animated: true,
+                    });
+                  });
+              }}>
+              {({
+                handleChange,
+                handleBlur,
+                handleSubmit,
+                values,
+                errors,
+                touched,
+              }) => (
+                <View style={styles.TextInputDiv}>
+                  <Input
+                    placeholder={'Password'}
+                    cursorColor={THEME_COLOR}
+                    placeholderTextColor={Gray}
+                    style={styles.textInput}
+                    value={values.new_password}
+                    onChangeText={handleChange('new_password')}
+                    onBlur={handleBlur('new_password')}
+                  />
+                  {touched.new_password && errors.new_password ? (
+                    <Text style={styles.validation}>{errors.new_password}</Text>
+                  ) : null}
+                  <Input
+                    placeholder={'Confirm Password'}
+                    cursorColor={THEME_COLOR}
+                    placeholderTextColor={Gray}
+                    style={styles.textInput}
+                    value={values.confrimPassword}
+                    onChangeText={handleChange('confrimPassword')}
+                    onBlur={handleBlur('confrimPassword')}
+                  />
+                  {touched.confrimPassword && errors.confrimPassword ? (
+                    <Text style={styles.validation}>
+                      {errors.confrimPassword}
+                    </Text>
+                  ) : null}
+
+                  <Button
+                    onPress={handleSubmit}
+                    title={'Update Password'}
+                    style={styles.SigninButton}
+                  />
+                </View>
+              )}
+            </Formik>
           </ScrollView>
         </KeyboardAvoidingView>
       </ImageBackground>
@@ -107,7 +198,7 @@ const styles = StyleSheet.create({
   },
   textInput: {
     width: '100%',
-    marginVertical: 15,
+    marginVertical: 10,
     color: Black,
   },
   ForgerPassDiv: {
@@ -169,8 +260,12 @@ const styles = StyleSheet.create({
     height: '55%',
     width: '15%',
   },
-  TextGoogle: {
-    color: Black,
-    fontSize: 15,
+  validation: {
+    color: 'red',
+    paddingLeft: 10,
+    textAlign: 'left',
+    width: '100%',
+    fontFamily: PoppinsRegular,
+    marginTop: -14,
   },
 });

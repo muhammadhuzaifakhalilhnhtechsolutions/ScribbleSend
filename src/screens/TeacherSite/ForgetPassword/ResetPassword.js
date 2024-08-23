@@ -54,7 +54,7 @@ const ResetPassword = ({ navigation }) => {
 
               <Button
                 onPress={() => navigation.navigate('Login')}
-                title={'Confrim Email'}
+                title={'Update Password'}
                 style={styles.SigninButton}
               />
             </View>

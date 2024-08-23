@@ -11,7 +11,7 @@ import {
   KeyboardAvoidingView,
   Platform,
 } from 'react-native';
-import React from 'react';
+import React, { useState } from 'react';
 import {
   Black,
   DarkGrey,
@@ -24,11 +24,29 @@ import { PopingBold, PoppinsRegular } from '../../../utils/Fonts';
 import Input from '../../../components/TextInput/Input';
 import Button from '../../../components/Button/Button';
 import FastImage from 'react-native-fast-image';
+import { Formik } from 'formik';
+import { SignupSchema } from '../../../Schema/Schemas';
+import {
+  PostApiWithOutToken,
+  PostApiWithOutTokenSignUp,
+} from '../../../api/helper';
+import { BaseUrl } from '../../../api/BaseUrl';
+import Loader from '../../../components/Loader/Loader';
+import { showMessage } from 'react-native-flash-message';
+import { useDispatch } from 'react-redux';
+import { updateUser } from '../../../stores/actions/userAction';
+import BackHeader from '../../../components/ShortHeader/ShortHeader';
+import { error } from 'pdf-lib';
 
 const StudentSignUp = ({ navigation }) => {
+  const [isLoading, setisLoading] = useState(false);
+  const dispatch = useDispatch();
+
   return (
     <SafeAreaView style={styles.main}>
       <StatusBar backgroundColor={White} barStyle={'dark-content'} />
+      <BackHeader onPress={() => navigation.goBack()} />
+      {isLoading && <Loader />}
       <ImageBackground
         style={styles.Backimg}
         source={require('../../../assets/images/background.png')}>
@@ -39,32 +57,148 @@ const StudentSignUp = ({ navigation }) => {
             <Text style={styles.WllcomeText}>
               Create an account so you can explore all the {'\n'}existing jobs
             </Text>
-            <View style={styles.TextInputDiv}>
-              <Input
-                placeholder={'Email'}
-                placeholderTextColor={Gray}
-                style={styles.textInput}
-                cursorColor={THEME_COLOR}
-              />
-              <Input
-                placeholder={'Password'}
-                cursorColor={THEME_COLOR}
-                placeholderTextColor={Gray}
-                style={styles.textInput}
-              />
-              <Input
-                placeholder={'Confrim Password'}
-                cursorColor={THEME_COLOR}
-                placeholderTextColor={Gray}
-                style={styles.textInput}
-              />
-              <Button title={'Sign Up'} style={styles.SigninButton} />
-              <TouchableOpacity
-                onPress={() => navigation.navigate('StudentLogin')}
-                style={styles.CrateDiv}>
-                <Text style={styles.CreatText}>Already have an account</Text>
-              </TouchableOpacity>
-            </View>
+            <Formik
+              initialValues={{
+                email: '',
+                password: '',
+                confrimPassword: '',
+                FullName: '',
+              }}
+              validationSchema={SignupSchema}
+              onSubmit={values => {
+                setisLoading(true);
+                console.log('values', values);
+                const userEmail = values.email?.toLocaleLowerCase()?.trim();
+
+                const formdata = new FormData();
+                formdata.append('name', values.FullName);
+                formdata.append('email', userEmail);
+                formdata.append('password', values.confrimPassword);
+
+                PostApiWithOutTokenSignUp(
+                  `${BaseUrl}/api/student/store`,
+                  formdata,
+                )
+                  .then(res => {
+                    console.log('res signup==>', res.data);
+                    if (res.data?.status) {
+                      navigation.navigate('StudentLogin');
+                      // dispatch(updateUser(res.data));
+                      setisLoading(false);
+                      showMessage({
+                        message: 'Success',
+                        description: res.data?.response,
+                        type: 'success',
+                        floating: true,
+                        animated: true,
+                      });
+                    } else {
+                      setisLoading(false);
+                    }
+                  })
+                  .catch(error => {
+                    console.log('error signup==>', error);
+                    setisLoading(false);
+                    const errorKeys =
+                      error && Object.keys(error?.response?.data?.errors);
+                    if (errorKeys?.length > 0) {
+                      errorKeys.forEach(key => {
+                        error?.response?.data?.errors[key]?.forEach(
+                          errorMsg => {
+                            showMessage({
+                              message: 'Failed',
+                              description: errorMsg,
+                              type: 'danger',
+                              animated: true,
+                              floating: true,
+                            });
+                          },
+                        );
+                      });
+                    }
+                  });
+              }}>
+              {({
+                handleChange,
+                handleBlur,
+                handleSubmit,
+                values,
+                errors,
+                touched,
+              }) => (
+                <View style={styles.TextInputDiv}>
+                  <Input
+                    placeholder={'Full Name'}
+                    placeholderTextColor={Gray}
+                    style={styles.textInput}
+                    cursorColor={THEME_COLOR}
+                    value={values.FullName}
+                    onChangeText={handleChange('FullName')}
+                    onBlur={handleBlur('FullName')}
+                  />
+                  {touched.FullName && errors.FullName ? (
+                    <Text style={styles.validation}>{errors.FullName}</Text>
+                  ) : null}
+                  <Input
+                    placeholder={'Email'}
+                    placeholderTextColor={Gray}
+                    style={styles.textInput}
+                    cursorColor={THEME_COLOR}
+                    value={values.email}
+                    onChangeText={handleChange('email')}
+                    onBlur={handleBlur('email')}
+                  />
+                  {touched.email && errors.email ? (
+                    <Text style={styles.validation}>{errors.email}</Text>
+                  ) : null}
+                  <Input
+                    placeholder={'Password'}
+                    cursorColor={THEME_COLOR}
+                    placeholderTextColor={Gray}
+                    style={styles.textInput}
+                    value={values.password}
+                    onChangeText={handleChange('password')}
+                    onBlur={handleBlur('password')}
+                  />
+                  {touched.password && errors.password ? (
+                    <Text style={styles.validation}>{errors.password}</Text>
+                  ) : null}
+                  <Input
+                    placeholder={'Confirm Password'}
+                    cursorColor={THEME_COLOR}
+                    placeholderTextColor={Gray}
+                    style={styles.textInput}
+                    value={values.confrimPassword}
+                    onChangeText={handleChange('confrimPassword')}
+                    onBlur={handleBlur('confrimPassword')}
+                  />
+                  {touched.confrimPassword && errors.confrimPassword ? (
+                    <Text style={styles.validation}>
+                      {errors.confrimPassword}
+                    </Text>
+                  ) : null}
+                  <Button
+                    title={'Sign Up'}
+                    style={styles.SigninButton}
+                    onPress={handleSubmit}
+                  />
+                </View>
+              )}
+            </Formik>
+            <TouchableOpacity
+              onPress={() => navigation.navigate('StudentLogin')}
+              style={styles.CrateDiv}>
+              <Text style={styles.CreatText}>
+                Already have an account?{' '}
+                <Text
+                  style={{
+                    ...styles.ContinueText,
+                    fontFamily: PopingBold,
+                  }}>
+                  Login
+                </Text>
+              </Text>
+            </TouchableOpacity>
             <View style={styles.SocialDiv}>
               <Text style={styles.ContinueText}>Or continue with</Text>
               <TouchableOpacity style={styles.SocialCard}>
@@ -111,13 +245,12 @@ const styles = StyleSheet.create({
     marginVertical: 20,
   },
   TextInputDiv: {
-    marginVertical: 20,
     alignItems: 'center',
     justifyContent: 'center',
   },
   textInput: {
     width: '100%',
-    marginVertical: 15,
+    marginVertical: 10,
     color: Black,
   },
   Forgettext: {
@@ -146,7 +279,7 @@ const styles = StyleSheet.create({
     color: DarkGrey,
     textAlign: 'center',
     fontFamily: PoppinsRegular,
-    marginVertical: 15,
+    // marginVertical: 15,
   },
   SocialDiv: {
     marginVertical: 15,
@@ -159,6 +292,7 @@ const styles = StyleSheet.create({
   ContinueText: {
     textAlign: 'center',
     color: THEME_COLOR,
+    fontSize: 14,
   },
   SocialCard: {
     marginVertical: 10,
@@ -178,5 +312,14 @@ const styles = StyleSheet.create({
   TextGoogle: {
     color: Black,
     fontSize: 15,
+    fontFamily: PoppinsRegular,
+  },
+  validation: {
+    color: 'red',
+    paddingLeft: 10,
+    textAlign: 'left',
+    width: '100%',
+    fontFamily: PoppinsRegular,
+    marginTop: -14,
   },
 });

@@ -3,9 +3,12 @@ import { TouchableOpacity, Text, StyleSheet } from 'react-native';
 import { PopingBold, PoppinsExtraBold } from '../../utils/Fonts';
 import { White } from '../../utils/Color';
 
-const Button = ({ onPress, title, style, textStyle }) => {
+const Button = ({ onPress, title, style, textStyle, disabled }) => {
   return (
-    <TouchableOpacity onPress={onPress} style={[styles.button, style]}>
+    <TouchableOpacity
+      onPress={onPress}
+      style={[styles.button, style]}
+      disabled={disabled}>
       <Text style={[styles.buttonText, textStyle]}>{title}</Text>
     </TouchableOpacity>
   );
@@ -23,7 +26,7 @@ const styles = StyleSheet.create({
   buttonText: {
     color: White,
     fontSize: 16,
-    fontFamily:PopingBold
+    fontFamily: PopingBold,
   },
 });
 

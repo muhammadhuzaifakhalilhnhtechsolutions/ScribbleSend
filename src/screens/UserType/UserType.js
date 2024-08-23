@@ -12,7 +12,7 @@ import FastImage from 'react-native-fast-image';
 import Button from '../../components/Button/Button';
 import { Black, THEME_COLOR, White } from '../../utils/Color';
 import { PopingBold, PoppinsRegular } from '../../utils/Fonts';
-import { HandleMainScreen } from '../../stores/actions/user.action';
+import { HandleMainScreen } from '../../stores/actions/userAction';
 import { useDispatch, useSelector } from 'react-redux';
 
 const UserType = ({ navigation }) => {
@@ -35,12 +35,16 @@ const UserType = ({ navigation }) => {
           </Text>
           <View style={styles.ButtonDiv}>
             <Button
-              onPress={() => navigation.navigate('Studentwellcome')}
+              onPress={() =>
+                navigation.navigate('Studentwellcome', { role: 'student' })
+              }
               title={'Student'}
               style={styles.LoginButton}
             />
             <Button
-              onPress={() => navigation.navigate('Wellcome')}
+              onPress={() =>
+                navigation.navigate('Wellcome', { role: 'teacher' })
+              }
               style={styles.Register}
               title={'Teacher'}
               textStyle={styles.text}

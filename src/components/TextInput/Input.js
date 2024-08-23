@@ -24,6 +24,8 @@ const Input = ({
   style,
   numberOfLines = 1,
   multiline,
+  onBlur,
+  editable,
 }) => {
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
   const isPassword = placeholder.toLowerCase().includes('password');
@@ -36,12 +38,16 @@ const Input = ({
     <View style={styles.ViewDiv}>
       <TextInput
         placeholder={placeholder}
-        placeholderTextColor={placeholderTextColor}
+        placeholderTextColor={
+          placeholderTextColor ? placeholderTextColor : 'gray'
+        }
         onChangeText={onChangeText}
         cursorColor={THEME_COLOR}
         value={value}
         numberOfLines={numberOfLines}
         multiline={multiline}
+        onBlur={onBlur}
+        editable={editable}
         secureTextEntry={isPassword && !isPasswordVisible}
         style={[
           { ...styles.inputstyles, paddingRight: isPassword ? 40 : 0 },
@@ -53,7 +59,7 @@ const Input = ({
           style={styles.icon}
           onPress={togglePasswordVisibility}>
           <Ionicons
-            name={isPasswordVisible ? 'eye-off' : 'eye'}
+            name={isPasswordVisible ? 'eye' : 'eye-off'}
             size={20}
             color={Gray}
           />

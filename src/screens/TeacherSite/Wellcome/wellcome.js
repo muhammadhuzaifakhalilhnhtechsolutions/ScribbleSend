@@ -12,7 +12,9 @@ import FastImage from 'react-native-fast-image';
 import Button from '../../../components/Button/Button';
 import { Black, THEME_COLOR, White } from '../../../utils/Color';
 import { PopingBold, PoppinsRegular } from '../../../utils/Fonts';
-const Wellcome = ({ navigation }) => {
+const Wellcome = ({ navigation, route }) => {
+  console.log('route==>', route.params.role);
+
   return (
     <SafeAreaView style={styles.main}>
       <StatusBar backgroundColor={White} barStyle={'dark-content'} />
@@ -30,7 +32,9 @@ const Wellcome = ({ navigation }) => {
           </Text>
           <View style={styles.ButtonDiv}>
             <Button
-              onPress={() => navigation.navigate('Login')}
+              onPress={() =>
+                navigation.navigate('Login', { role: route.params.role })
+              }
               title={'Login'}
               style={styles.LoginButton}
             />
@@ -38,7 +42,9 @@ const Wellcome = ({ navigation }) => {
               style={styles.Register}
               title={'Register'}
               textStyle={styles.text}
-              onPress={() => navigation.navigate('SignUp')}
+              onPress={() =>
+                navigation.navigate('SignUp', { role: route.params.role })
+              }
             />
           </View>
         </View>

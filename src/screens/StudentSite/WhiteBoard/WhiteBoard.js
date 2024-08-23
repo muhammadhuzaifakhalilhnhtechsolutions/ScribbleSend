@@ -10,7 +10,9 @@ import {
   ToastAndroid,
   Alert,
   Dimensions,
+  Text,
   ScrollView,
+  Button,
 } from 'react-native';
 import Svg, { Path } from 'react-native-svg';
 import {
@@ -20,22 +22,27 @@ import {
 } from 'react-native-gesture-handler';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import Fontisto from 'react-native-vector-icons/Fontisto';
+import Ionicons from 'react-native-vector-icons/Ionicons';
 import DraggableText from '../../../components/DragableText/DragableText';
 import { PenModal, TextModal } from '../../../components/Modals/Modals';
 import RecordScreen, { RecordingResult } from 'react-native-record-screen';
 import RNFS from 'react-native-fs';
 import { PERMISSIONS, RESULTS } from 'react-native-permissions';
 import moment from 'moment';
-
 import { captureRef } from 'react-native-view-shot';
 import { PDFDocument, scale } from 'pdf-lib';
 import { encode } from 'base64-arraybuffer';
 import Share from 'react-native-share';
 import Loader from '../../../components/Loader/Loader';
+import { Black } from '../../../utils/Color';
+import { PoppinsRegular } from '../../../utils/Fonts';
 
 const { height, width } = Dimensions.get('screen');
 
-const WhiteBoard = () => {
+const WhiteBoard = ({ navigation, route }) => {
+  const AllData = route.params?.data;
+  const currIndex = route.params?.index;
+  const currQues = route.params?.item;
   const [currentStroke, setCurrentStroke] = useState({
     path: '',
     color: 'black',
@@ -59,6 +66,8 @@ const WhiteBoard = () => {
   const [selectedTextId, setSelectedTextId] = useState(null);
   const [shareLoading, setshareLoading] = useState(false);
   const [panOffset, setPanOffset] = useState({ x: 0, y: 0 });
+  const questions = AllData?.questions;
+  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [drawingAreaSize, setDrawingAreaSize] = useState({
     width: width,
     height: height,
@@ -72,7 +81,17 @@ const WhiteBoard = () => {
   const svgRef = useRef(null);
   const mobileVersion = Platform.constants['Release'];
 
-  console.log(drawingAreaSize);
+  const handleNext = () => {
+    if (currentQuestionIndex < questions?.length - 1) {
+      setCurrentQuestionIndex(currentQuestionIndex + 1);
+    }
+  };
+
+  const handlePrevious = () => {
+    if (currentQuestionIndex > 0) {
+      setCurrentQuestionIndex(currentQuestionIndex - 1);
+    }
+  };
 
   const createNewTextData = () => ({
     id: textDataList?.length + 1,
@@ -426,6 +445,29 @@ const WhiteBoard = () => {
     <SafeAreaView style={styles.container}>
       <StatusBar backgroundColor={'#EEEEEE'} barStyle={'dark-content'} />
       {shareLoading && <Loader />}
+      <View style={styles.topHeader}>
+        <Text numberOfLines={1} style={styles.worksheetText}>
+          {moment(currQues?.created_at).format('DD-MM-YY') +
+            ' ' +
+            currQues?.question_text}
+        </Text>
+        <Text style={styles.totalQues}>
+          {currentQuestionIndex + 1} / {questions?.length}
+        </Text>
+      </View>
+      <View style={styles.navigationBox}>
+        <TouchableOpacity
+          onPress={handlePrevious}
+          disabled={currentQuestionIndex === 0}>
+          <Ionicons name="chevron-back" size={30} color="#007bff" />
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          onPress={handleNext}
+          disabled={currentQuestionIndex === questions.length - 1}>
+          <Ionicons name="chevron-forward" size={30} color="#007bff" />
+        </TouchableOpacity>
+      </View>
       <GestureHandlerRootView style={{ flex: 1, width: '100%' }}>
         <GestureDetector gesture={composedGesture}>
           <View
@@ -471,7 +513,6 @@ const WhiteBoard = () => {
                 />
               ) : null}
             </Svg>
-
             {textDataList.map(textData => (
               <DraggableText
                 key={textData.id}
@@ -567,6 +608,40 @@ const styles = StyleSheet.create({
     justifyContent: 'space-around',
     alignItems: 'center',
     backgroundColor: 'gray',
+  },
+  topHeader: {
+    height: 40,
+    width: '100%',
+    justifyContent: 'center',
+    paddingHorizontal: 10,
+    backgroundColor: '#EEE',
+    // backgroundColor: 'red',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    zIndex: 1,
+  },
+  worksheetText: {
+    color: Black,
+    fontSize: 14,
+    fontFamily: PoppinsRegular,
+    width: '85%',
+  },
+  totalQues: {
+    color: Black,
+    fontSize: 14,
+    fontFamily: PoppinsRegular,
+    width: '14%',
+    textAlign: 'center',
+  },
+  navigationBox: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    backgroundColor: 'transparent',
+    position: 'absolute',
+    top: '45%',
+    width: '100%',
+    zIndex: 1,
   },
 });
 

@@ -1,31 +1,45 @@
-import { stat } from "react-native-fs"
-import { act } from "react-test-renderer"
+const init = {
+  user: [],
+  getSpecilities: [],
+  getViewHospital: [],
+  getprofileDetails: [],
+  getappointment: [],
+  all_hospitals: [],
+  patient_Message: [],
+  doctor_Message: [],
+  doctor_list: [],
+  patient_list: [],
+  appointments: [],
+  all_appointments: [],
+  allregin: 'Canada',
+  doctor_appointments: [],
+  patient_appointments: [],
+  msg_state: 0,
+  Loading_hospital: false,
+  docDetailApp: null,
+  detailsApp: null,
+  analytics: [],
+  package_Status: true,
+};
+const reducer = (state = init, action) => {
+  // console.log('action user', action)
 
-const initialState = {
-  users: null,
-  userss: [],
-  ConditionMAin:null
-  
-
-}
-
-export const userReducer = (state = initialState, action) => {
-  const { payload } = action
   switch (action.type) {
-    case 'LOGIN_PROCESSED':
+    case 'UPDATE_USER': {
+      // console.log('action user', action.user)
       return {
         ...state,
-        users: payload
-      }
-   
-      case 'Condition':
-        return {
-          ...state,
-          ConditionMAin: payload
-        }    
-    default:
-      return state
-  }
-}
+        user: action.user,
+      };
+    }
 
-export default userReducer
+    case 'REMOVE_USER': {
+      return { ...state, user: null };
+    }
+    default: {
+      return state;
+    }
+  }
+};
+
+export default reducer;

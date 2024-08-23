@@ -16,7 +16,7 @@ const Header = ({ icon, title, onPress }) => {
         style={{
           ...styles.divTitle,
           width: icon ? '90%' : '100%',
-          right: icon ? 10 : 0,
+          right: icon ? 20 : 0,
         }}>
         <Text style={styles.title}>{title}</Text>
       </View>
