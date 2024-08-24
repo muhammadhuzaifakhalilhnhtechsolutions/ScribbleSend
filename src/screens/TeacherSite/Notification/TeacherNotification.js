@@ -6,15 +6,49 @@ import {
   Text,
   View,
 } from 'react-native';
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { BG_COLOR, Black, THEME_COLOR } from '../../../utils/Color';
 import Header from '../../../components/Header/Header';
 import { PopingBold } from '../../../utils/Fonts';
+import { useSelector } from 'react-redux';
+import { getApiWithToken } from '../../../api/helper';
+import { BaseUrl } from '../../../api/BaseUrl';
+import Loader from '../../../components/Loader/Loader';
 
 const TeacherNotification = ({ navigation }) => {
+  const userData = useSelector(state => state.userReducer?.user?.data);
+  const [notificationData, setNotificationData] = useState([]);
+  const [isLoading, setisLoading] = useState(false);
+
+  useEffect(() => {
+    getAllNotifications();
+  }, []);
+
+  const getAllNotifications = () => {
+    setisLoading(true);
+    getApiWithToken(
+      `${BaseUrl}/api/teacher/assessment/notifications/all`,
+      '',
+      userData?.token,
+    )
+      .then(res => {
+        console.log('res notiii===>', res.data);
+        if (res.data.status) {
+          setNotificationData(res.data.data);
+          setisLoading(false);
+        } else {
+          setisLoading(false);
+        }
+      })
+      .catch(error => {
+        setisLoading(false);
+        console.log('error notiii===>', error);
+      });
+  };
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar barStyle={'light-content'} backgroundColor={THEME_COLOR} />
+      {isLoading && <Loader />}
       <Header
         title={'Notifications'}
         icon={true}

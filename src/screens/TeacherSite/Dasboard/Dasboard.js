@@ -60,6 +60,7 @@ const Dashboard = ({ navigation }) => {
 
   const onRefresh = useCallback(() => {
     getAssissments();
+    getCount();
   }, []);
 
   const getAssissments = () => {
@@ -109,31 +110,35 @@ const Dashboard = ({ navigation }) => {
   const handleSearched = data => {
     if (data.trim() == '') {
       setfilterData([]);
-    }
-    setsearches(data);
-    setsearchLoader(true);
-    getApiWithToken(
-      `${BaseUrl}/api/teacher/students/assessments?name=${data}&date=${date}`,
-      '',
-      userData?.token,
-    )
-      .then(res => {
-        console.log('response searched==>', res.data);
-        if (res.data.status) {
-          setTimeout(() => {
-            setfilterData(res.data.data);
+      setsearches(data);
+      console.log('iffff');
+    } else {
+      console.log('else');
+      setsearches(data);
+      setsearchLoader(true);
+      getApiWithToken(
+        `${BaseUrl}/api/teacher/students/assessments?name=${data}&date=${date}`,
+        '',
+        userData?.token,
+      )
+        .then(res => {
+          console.log('response searched==>', res.data);
+          if (res.data.status) {
+            setTimeout(() => {
+              setfilterData(res.data.data);
+              setsearchLoader(false);
+            }, 500);
+          } else {
+            setfilterData([]);
             setsearchLoader(false);
-          }, 500);
-        } else {
+          }
+        })
+        .catch(error => {
+          console.log('error searched==>', error);
           setfilterData([]);
           setsearchLoader(false);
-        }
-      })
-      .catch(error => {
-        console.log('error searched==>', error);
-        setfilterData([]);
-        setsearchLoader(false);
-      });
+        });
+    }
   };
 
   return (
@@ -204,46 +209,6 @@ const Dashboard = ({ navigation }) => {
 
           <View style={{ ...styles.BottomBox, height: height * 0.53 }}>
             <Text style={styles.headingText}>Received Assissments</Text>
-            {/* <ScrollView
-              nestedScrollEnabled
-              showsVerticalScrollIndicator={false}
-              refreshControl={
-                <RefreshControl
-                  colors={[THEME_COLOR]}
-                  refreshing={refreshing}
-                  onRefresh={onRefresh}
-                  title="Pull to refresh"
-                  tintColor={THEME_COLOR}
-                />
-              }>
-              {receivedAssissments.length > 0 ? (
-                receivedAssissments?.map((item, index) => {
-                  return (
-                    <TouchableOpacity
-                      key={index}
-                      style={styles.worksheetBtn}
-                      onPress={() =>
-                        navigation.navigate('StudentList', { item })
-                      }>
-                      <Text numberOfLines={1} style={styles.worksheetText}>
-                        {moment(item?.created_at).format('DD-MM-YY') +
-                          ' ' +
-                          item?.heading}
-                      </Text>
-                    </TouchableOpacity>
-                  );
-                })
-              ) : (
-                <View
-                  style={{
-                    marginTop: height * 0.15,
-                  }}>
-                  <Text style={styles.emptyText}>
-                    No received worksheets found.
-                  </Text>
-                </View>
-              )}
-            </ScrollView> */}
 
             {searchLoader ? (
               <ActivityIndicator

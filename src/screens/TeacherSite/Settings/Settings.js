@@ -124,7 +124,7 @@ const styles = StyleSheet.create({
   userImage: {
     height: 150,
     width: 150,
-    backgroundColor: White,
+    backgroundColor: '#EEEEEE',
     borderRadius: 360,
     alignSelf: 'center',
   },

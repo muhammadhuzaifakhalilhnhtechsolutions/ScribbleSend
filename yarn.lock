@@ -3161,6 +3161,7 @@ __metadata:
     react-native: 0.73.3
     react-native-blob-util: ^0.19.11
     react-native-confirmation-code-field: ^7.4.0
+    react-native-device-info: ^11.1.0
     react-native-document-picker: ^9.3.0
     react-native-fast-image: ^8.6.3
     react-native-flash-message: ^0.4.2
@@ -8545,6 +8546,15 @@ __metadata:
     react-native:
       optional: true
   checksum: 1b12535c5037994cb4c5aee4a0d72d0034bb41bc8cda15aec99e1570174b5980fef5d3c54e450a87a387af26265f74813bdb889aef600e3a15242ac940c0f29d
+  languageName: node
+  linkType: hard
+
+"react-native-device-info@npm:^11.1.0":
+  version: 11.1.0
+  resolution: "react-native-device-info@npm:11.1.0"
+  peerDependencies:
+    react-native: "*"
+  checksum: 272cab82573933a1f3a9bc394b82a387ccbdf9fbef131fc1f04b8ff78b36f581931b5c643f5aa278f28577cbc320ef2ac588cafdb73292e9b0cf4427d54c44ce
   languageName: node
   linkType: hard
 

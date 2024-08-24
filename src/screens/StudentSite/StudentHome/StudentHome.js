@@ -25,6 +25,7 @@ import { BaseUrl } from '../../../api/BaseUrl';
 import { useSelector } from 'react-redux';
 import Loader from '../../../components/Loader/Loader';
 import { PopingBold } from '../../../utils/Fonts';
+import { showMessage } from 'react-native-flash-message';
 const { height } = Dimensions.get('screen');
 
 const StudentHome = ({ navigation }) => {
@@ -59,6 +60,7 @@ const StudentHome = ({ navigation }) => {
 
   const onRefresh = useCallback(() => {
     getAssissments();
+    getCount();
   }, []);
 
   const getAssissments = () => {
@@ -77,6 +79,13 @@ const StudentHome = ({ navigation }) => {
       .catch(error => {
         console.log('error home==>', error);
         setisLoading(false);
+        showMessage({
+          message: 'Failed',
+          description: 'something went wrong! Please try again later.',
+          type: 'danger',
+          floating: true,
+          animated: true,
+        });
       });
   };
 
@@ -111,31 +120,33 @@ const StudentHome = ({ navigation }) => {
   const handleSearched = data => {
     if (data.trim() == '') {
       setfilterData([]);
-    }
-    setsearches(data);
-    setsearchLoader(true);
-    getApiWithToken(
-      `${BaseUrl}/api/student/assessment/teacher/view?pick_date=${date}&name=${data}`,
-      '',
-      userData?.token,
-    )
-      .then(res => {
-        // console.log('response searched==>', res.data);
-        if (res.data.status) {
-          setTimeout(() => {
-            setfilterData(res.data.data);
+      setsearches(data);
+    } else {
+      setsearches(data);
+      setsearchLoader(true);
+      getApiWithToken(
+        `${BaseUrl}/api/student/teachers/assessments?name=${data}&date=${date}`,
+        '',
+        userData?.token,
+      )
+        .then(res => {
+          console.log('response searched==>', res.data);
+          if (res.data.status) {
+            setTimeout(() => {
+              setfilterData(res.data.data);
+              setsearchLoader(false);
+            }, 500);
+          } else {
+            setfilterData([]);
             setsearchLoader(false);
-          }, 500);
-        } else {
+          }
+        })
+        .catch(error => {
+          console.log('error searched==>', error);
           setfilterData([]);
           setsearchLoader(false);
-        }
-      })
-      .catch(error => {
-        console.log('error searched==>', error);
-        setfilterData([]);
-        setsearchLoader(false);
-      });
+        });
+    }
   };
 
   return (
@@ -190,11 +201,15 @@ const StudentHome = ({ navigation }) => {
           <View style={styles.divBox}>
             <View style={styles.divBox1}>
               <View style={styles.divBox2}>
-                <Text style={{ ...styles.text1, color: '#B4530A' }}>89%</Text>
+                <Text style={{ ...styles.text1, color: '#B4530A' }}>
+                  {allCounts?.presence}
+                </Text>
                 <Text style={styles.text2}>Presence</Text>
               </View>
               <View style={styles.divBox2}>
-                <Text style={{ ...styles.text1, color: '#4078D3' }}>77%</Text>
+                <Text style={{ ...styles.text1, color: '#4078D3' }}>
+                  {allCounts?.completeness}
+                </Text>
                 <Text style={styles.text2}>Completeness</Text>
               </View>
             </View>
@@ -206,16 +221,16 @@ const StudentHome = ({ navigation }) => {
                 <Text style={styles.text2}>Assignments</Text>
               </View>
               <View style={styles.divBox2}>
-                <Text style={{ ...styles.text1, color: '#F59E0C' }}>12</Text>
+                <Text style={{ ...styles.text1, color: '#F59E0C' }}>
+                  {allCounts?.not_attempt}
+                </Text>
                 <Text style={styles.text2}>Not Attend</Text>
               </View>
             </View>
           </View>
 
           <View style={styles.BottomBox}>
-            <Text style={styles.headingText}>
-              {filterData.length > 0 ? 'WorkSheets' : 'Saved WorkSheets'}
-            </Text>
+            <Text style={styles.headingText}>Saved WorkSheets</Text>
             {searchLoader ? (
               <ActivityIndicator
                 color={THEME_COLOR}

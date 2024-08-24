@@ -1,13 +1,7 @@
-import React, { useState } from 'react';
-import {
-  StyleSheet,
-  Text,
-  View,
-  TouchableOpacity,
-  PanResponder,
-} from 'react-native';
+import React from 'react';
+import { StyleSheet, Text, PanResponder } from 'react-native';
 import Animated from 'react-native-reanimated';
-import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import { THEME_COLOR } from '../../utils/Color';
 
 // const DraggableText = ({
 //   textData,
@@ -98,6 +92,7 @@ const DraggableText = ({
   setTextDataList,
   onStartDrag,
   onEndDrag,
+  isSelected,
 }) => {
   const dragRate = 0.5;
 
@@ -131,6 +126,10 @@ const DraggableText = ({
         position: 'absolute',
         left: textData.x,
         top: textData.y,
+        padding: 10,
+        borderRadius: 5,
+        borderColor: isSelected ? THEME_COLOR : null,
+        borderWidth: isSelected ? 1 : null,
       }}
       {...panResponder.panHandlers}>
       <Text style={{ fontSize: textData.size, color: textData.color }}>
@@ -152,7 +151,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   selectedText: {
-    borderColor: 'blue',
+    borderColor: THEME_COLOR,
     borderWidth: 1,
   },
   options: {

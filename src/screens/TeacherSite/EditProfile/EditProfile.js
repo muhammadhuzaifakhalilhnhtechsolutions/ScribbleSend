@@ -11,7 +11,7 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { BG_COLOR, Black, THEME_COLOR, White } from '../../../utils/Color';
 import Header from '../../../components/Header/Header';
 import Input from '../../../components/TextInput/Input';
@@ -21,19 +21,20 @@ import Feather from 'react-native-vector-icons/Feather';
 import { PopingBold } from '../../../utils/Fonts';
 import Button from '../../../components/Button/Button';
 import { launchImageLibrary } from 'react-native-image-picker';
-import { PERMISSIONS, request, RESULTS } from 'react-native-permissions';
+import { PERMISSIONS, request, requestMultiple, RESULTS } from 'react-native-permissions';
 import { PostApi } from '../../../api/helper';
 import { BaseUrl } from '../../../api/BaseUrl';
 import { showMessage } from 'react-native-flash-message';
 import Loader from '../../../components/Loader/Loader';
 import { updateUser } from '../../../stores/actions/userAction';
+import DeviceInfo from 'react-native-device-info';
 
 const { height, width } = Dimensions.get('screen');
 
 const EditProfile = ({ navigation }) => {
   const userData = useSelector(state => state.userReducer.user.data);
   const [fullName, setfullName] = useState(userData.name);
-  const mobileVersion = Platform.constants['Release'];
+  const [androidVersion, setAndroidVersion] = useState('');
   const [isLoading, setisLoading] = useState(false);
   const dispatch = useDispatch();
   const [image, setImage] = useState({
@@ -41,6 +42,12 @@ const EditProfile = ({ navigation }) => {
     type: 'image/jpeg',
     uri: userData?.image,
   });
+
+  useEffect(() => {
+    const version = DeviceInfo.getSystemVersion();
+    const majorVersion = version.split('.')[0];
+    setAndroidVersion(majorVersion);
+  }, []);
 
   const requestPermissions = async () => {
     if (Platform.OS === 'android') {
@@ -64,18 +71,16 @@ const EditProfile = ({ navigation }) => {
 
   const requestAndroidPermissions = async () => {
     try {
-      const granted = await PermissionsAndroid.requestMultiple(
-        mobileVersion >= 13 && requestPermissionsArray,
+      const granted = await requestMultiple(
+        androidVersion < 13 ? requestPermissionsArray : [],
       );
       if (
-        mobileVersion >= 13
+        androidVersion >= 13
           ? handlePickImage()
-          : granted['android.permission.READ_EXTERNAL_STORAGE'] ===
-              PermissionsAndroid.RESULTS.GRANTED &&
-            granted['android.permission.WRITE_EXTERNAL_STORAGE'] ===
-              PermissionsAndroid.RESULTS.GRANTED &&
-            granted['android.permission.READ_MEDIA_IMAGES'] ===
-              PermissionsAndroid.RESULTS.GRANTEDF
+          : granted[PERMISSIONS.ANDROID.READ_EXTERNAL_STORAGE] ===
+              RESULTS.GRANTED &&
+            granted[PERMISSIONS.ANDROID.WRITE_EXTERNAL_STORAGE] ===
+              RESULTS.GRANTED
       ) {
         console.log('All permissions granted');
         handlePickImage();

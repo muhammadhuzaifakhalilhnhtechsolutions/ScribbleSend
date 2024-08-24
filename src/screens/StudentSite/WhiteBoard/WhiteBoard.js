@@ -11,8 +11,7 @@ import {
   Alert,
   Dimensions,
   Text,
-  ScrollView,
-  Button,
+  BackHandler,
 } from 'react-native';
 import Svg, { Path } from 'react-native-svg';
 import {
@@ -30,12 +29,14 @@ import RNFS from 'react-native-fs';
 import { PERMISSIONS, RESULTS } from 'react-native-permissions';
 import moment from 'moment';
 import { captureRef } from 'react-native-view-shot';
-import { PDFDocument, scale } from 'pdf-lib';
+import { PDFDocument } from 'pdf-lib';
 import { encode } from 'base64-arraybuffer';
 import Share from 'react-native-share';
 import Loader from '../../../components/Loader/Loader';
 import { Black } from '../../../utils/Color';
 import { PoppinsRegular } from '../../../utils/Fonts';
+import { showMessage } from 'react-native-flash-message';
+import DeviceInfo from 'react-native-device-info';
 
 const { height, width } = Dimensions.get('screen');
 
@@ -62,10 +63,13 @@ const WhiteBoard = ({ navigation, route }) => {
   const [textDataList, setTextDataList] = useState([]);
   const [isRecording, setisRecording] = useState(false);
   const [selectedTextId, setSelectedTextId] = useState(null);
+  const [androidVersion, setAndroidVersion] = useState('');
   const [shareLoading, setshareLoading] = useState(false);
   const [panOffset, setPanOffset] = useState({ x: 0, y: 0 });
   const questions = AllData?.questions;
-  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
+  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(
+    route?.params?.index,
+  );
   const [drawings, setDrawings] = useState({});
   const [textDrawings, setTextDrawings] = useState({});
   const [drawingAreaSize, setDrawingAreaSize] = useState({
@@ -79,11 +83,39 @@ const WhiteBoard = ({ navigation, route }) => {
   const textInputRef = useRef(null);
   const doubleClickThresholdText = useRef(null);
   const svgRef = useRef(null);
-  const mobileVersion = Platform.constants['Release'];
+
+  useEffect(() => {
+    const version = DeviceInfo.getSystemVersion();
+    const majorVersion = version.split('.')[0];
+    setAndroidVersion(majorVersion);
+
+    const backHandler = BackHandler.addEventListener(
+      'hardwareBackPress',
+      backAction,
+    );
+
+    return () => backHandler.remove();
+  }, []);
 
   useEffect(() => {
     loadDrawingForCurrentQuestion();
   }, [currentQuestionIndex]);
+
+  const backAction = () => {
+    Alert.alert(
+      'Hold on!',
+      'Are you sure you want to go back? All data will be lost.',
+      [
+        {
+          text: 'Cancel',
+          onPress: () => null,
+          style: 'cancel',
+        },
+        { text: 'YES', onPress: () => navigation.goBack() },
+      ],
+    );
+    return true;
+  };
 
   const handleNext = () => {
     saveCurrentDrawing();
@@ -129,8 +161,8 @@ const WhiteBoard = ({ navigation, route }) => {
     text: '',
     color: 'black',
     size: 16,
-    x: 100,
-    y: 100,
+    x: width / 2.6,
+    y: drawingAreaSize.height / 2.6,
   });
 
   const addNewText = () => {
@@ -325,9 +357,9 @@ const WhiteBoard = ({ navigation, route }) => {
     setModalVisibleText(false);
   };
 
-  const requestPermissions = async () => {
+  const requestPermissions = async value => {
     if (Platform.OS === 'android') {
-      await requestAndroidPermissions();
+      await requestAndroidPermissions(value);
     } else {
       const statuses = await request(
         PERMISSIONS.IOS.PHOTO_LIBRARY,
@@ -338,7 +370,11 @@ const WhiteBoard = ({ navigation, route }) => {
         statuses[PERMISSIONS.IOS.MICROPHONE] === RESULTS.GRANTED
       ) {
         console.log('All permissions granted');
-        startRecording();
+        if (value === 'share') {
+          convertSvgToPdf();
+        } else {
+          startRecording();
+        }
       } else {
         console.log('Permissions denied');
       }
@@ -354,14 +390,16 @@ const WhiteBoard = ({ navigation, route }) => {
 
   const requestPermissionsAbove = [PermissionsAndroid.PERMISSIONS.RECORD_AUDIO];
 
-  const requestAndroidPermissions = async () => {
+  const requestAndroidPermissions = async value => {
     try {
       const granted = await PermissionsAndroid.requestMultiple(
-        mobileVersion >= 13 ? requestPermissionsAbove : requestPermissionsArray,
+        androidVersion >= 13
+          ? requestPermissionsAbove
+          : requestPermissionsArray,
       );
       console.log('Permissions granted ==>', granted);
       if (
-        mobileVersion >= 13
+        androidVersion >= 13
           ? granted['android.permission.RECORD_AUDIO'] ===
             PermissionsAndroid.RESULTS.GRANTED
           : (granted['android.permission.READ_EXTERNAL_STORAGE'] ===
@@ -374,7 +412,11 @@ const WhiteBoard = ({ navigation, route }) => {
               PermissionsAndroid.RESULTS.GRANTED
       ) {
         console.log('All permissions granted');
-        startRecording();
+        if (value === 'share') {
+          convertSvgToPdf();
+        } else {
+          startRecording();
+        }
       } else {
         console.log('Permissions denied');
       }
@@ -398,6 +440,7 @@ const WhiteBoard = ({ navigation, route }) => {
   const stopRecording = async () => {
     try {
       const res = await RecordScreen.stopRecording();
+      console.log('res stopped', res);
       if (res?.status === 'success') {
         const destinationPath = `${
           RNFS.DownloadDirectoryPath
@@ -469,7 +512,7 @@ const WhiteBoard = ({ navigation, route }) => {
           .catch(err => {
             Alert.alert(
               'Success',
-              `PDF doesn't share but saved successfully in Downloads as ${uniqueFilename}!`,
+              `PDF doesn't share but saved successfully in Downloadq  s as ${uniqueFilename}!`,
             );
             setshareLoading(false);
           });
@@ -479,6 +522,21 @@ const WhiteBoard = ({ navigation, route }) => {
     } catch (error) {
       setshareLoading(false);
       console.log('Error creating PDF:', error);
+      showMessage({
+        message: 'Failed',
+        description: 'Failed to create PDF',
+        type: 'danger',
+        floating: true,
+        animated: true,
+      });
+    }
+  };
+
+  const handleFunctions = val => {
+    if (val == 'share') {
+      requestPermissions('share');
+    } else {
+      requestPermissions('recording');
     }
   };
 
@@ -514,6 +572,7 @@ const WhiteBoard = ({ navigation, route }) => {
       <GestureHandlerRootView style={{ flex: 1, width: '100%' }}>
         <GestureDetector gesture={composedGesture}>
           <View
+            ref={svgRef}
             style={{
               width: drawingAreaSize.width,
               height: drawingAreaSize.height,
@@ -529,7 +588,6 @@ const WhiteBoard = ({ navigation, route }) => {
               ],
             }}>
             <Svg
-              ref={svgRef}
               xmlns="http://www.w3.org/2000/svg"
               onPress={() =>
                 setCurrentStroke({
@@ -594,7 +652,7 @@ const WhiteBoard = ({ navigation, route }) => {
         </TouchableOpacity>
         <TouchableOpacity
           onPress={() => {
-            isRecording ? stopRecording() : requestPermissions();
+            isRecording ? stopRecording() : requestPermissions('recording');
           }}>
           <Fontisto
             name={isRecording ? 'stop' : 'record'}
@@ -605,7 +663,10 @@ const WhiteBoard = ({ navigation, route }) => {
         <TouchableOpacity onPress={addNewText} onLongPress={handleDoubleClick}>
           <MaterialCommunityIcons name="format-text" size={24} color="black" />
         </TouchableOpacity>
-        <TouchableOpacity onPress={convertSvgToPdf}>
+        <TouchableOpacity
+          onPress={() => {
+            handleFunctions('share');
+          }}>
           <MaterialCommunityIcons name="share" size={24} color="black" />
         </TouchableOpacity>
       </View>
