@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   Dimensions,
   ImageBackground,
@@ -32,10 +32,56 @@ import { BaseUrl } from '../../../api/BaseUrl';
 import { useDispatch } from 'react-redux';
 import { showMessage } from 'react-native-flash-message';
 import { updateUser } from '../../../stores/actions/userAction';
+import messaging from '@react-native-firebase/messaging';
+import { GoogleSignin } from '@react-native-google-signin/google-signin';
 
 const Login = ({ navigation, route }) => {
   const [isLoading, setisLoading] = useState(false);
+  const [fcmToken, setFcmToken] = useState('');
+  const [userDetailsGoogle, setuserDetailsGoogle] = useState(null);
   const dispatch = useDispatch();
+
+  useEffect(() => {
+    requestFCM();
+  }, []);
+
+  const requestFCM = async () => {
+    messaging()
+      .hasPermission()
+      .then(enabled => {
+        if (enabled) {
+        } else {
+          messaging()
+            .requestPermission()
+            .then(e => {
+              console.log('permission', e);
+            })
+            .catch(error => {
+              console.log('fcm error', error);
+            });
+        }
+      })
+      .catch(err => console.log('fcm catch err', err));
+
+    messaging()
+      .getToken()
+      .then(token => {
+        setFcmToken(token);
+      });
+  };
+
+  console.log('fcm token==>', fcmToken);
+
+  const signInWithGoogle = async () => {
+    try {
+      await GoogleSignin.hasPlayServices();
+      const userInfo = await GoogleSignin.signIn();
+      setuserDetailsGoogle({ userInfo });
+      console.log('res google signin==>', userInfo);
+    } catch (error) {
+      console.log('error google signin==>', error);
+    }
+  };
 
   return (
     <SafeAreaView style={styles.main}>
@@ -166,7 +212,7 @@ const Login = ({ navigation, route }) => {
                       <Text style={styles.CreatText}>Create new account</Text>
                     </TouchableOpacity>
                   </View>
-                  <View style={styles.SocialDiv}>
+                  <View style={styles.SocialDiv} onPress={signInWithGoogle}>
                     <Text style={styles.ContinueText}>Or continue with</Text>
                     <TouchableOpacity style={styles.SocialCard}>
                       <FastImage

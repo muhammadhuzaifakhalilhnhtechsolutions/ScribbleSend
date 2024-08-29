@@ -1,0 +1,54 @@
+{
+  "project_info": {
+    "project_number": "99750710423",
+    "project_id": "scribble-send",
+    "storage_bucket": "scribble-send.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:99750710423:android:4f6b6e2956334b6af82dd2",
+        "android_client_info": {
+          "package_name": "com.scribblesend"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "99750710423-90pk11s7fd5a7ccfpau4qp7edvr8o2s3.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.scribblesend",
+            "certificate_hash": "5e8f16062ea3cd2c4a0d547876baa6f38cabf625"
+          }
+        },
+        {
+          "client_id": "99750710423-b2vk6rfgifve4k0tnmu6cep0a2rrecg1.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCPUz_2K0Shs0OemBDBpn2Sx3wMkTSfghc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "99750710423-b2vk6rfgifve4k0tnmu6cep0a2rrecg1.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "99750710423-69bf0vsl8hg2vr62aum0d4rnp23utnm2.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.scribblesend"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

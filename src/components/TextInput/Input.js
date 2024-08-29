@@ -4,6 +4,7 @@ import {
   View,
   TextInput,
   TouchableOpacity,
+  Platform,
 } from 'react-native';
 import React, { useState } from 'react';
 import Ionicons from 'react-native-vector-icons/Ionicons';
@@ -86,6 +87,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: Black,
     fontFamily: PoppinsRegular,
+    paddingVertical: Platform.OS === 'ios' ? 16 : 10,
   },
   icon: {
     position: 'absolute',
