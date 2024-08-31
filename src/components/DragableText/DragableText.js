@@ -2,6 +2,7 @@ import React from 'react';
 import { StyleSheet, Text, PanResponder } from 'react-native';
 import Animated from 'react-native-reanimated';
 import { THEME_COLOR } from '../../utils/Color';
+import { PoppinsRegular } from '../../utils/Fonts';
 
 // const DraggableText = ({
 //   textData,
@@ -132,7 +133,12 @@ const DraggableText = ({
         borderWidth: isSelected ? 1 : null,
       }}
       {...panResponder.panHandlers}>
-      <Text style={{ fontSize: textData.size, color: textData.color }}>
+      <Text
+        style={{
+          fontSize: textData.size,
+          color: textData.color,
+          fontFamily: PoppinsRegular,
+        }}>
         {textData.text}
       </Text>
     </Animated.View>

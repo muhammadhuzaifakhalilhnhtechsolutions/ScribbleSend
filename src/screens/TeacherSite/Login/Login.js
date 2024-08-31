@@ -110,6 +110,8 @@ const Login = ({ navigation, route }) => {
                 formdata.append('type', 'teacher');
                 formdata.append('email', userEmail);
                 formdata.append('password', values.password);
+                formdata.append('fcm_token', fcmToken);
+                formdata.append('device_type', Platform.OS);
 
                 PostApiWithOutToken(`${BaseUrl}/api/login`, formdata)
                   .then(res => {

@@ -22,7 +22,7 @@ import {
 } from '../../../utils/Color';
 import { PopingBold, PoppinsRegular } from '../../../utils/Fonts';
 import { Formik } from 'formik';
-import { ResetPassword } from '../../../Schema/Schemas';
+import { ResetPasswordSchema } from '../../../Schema/Schemas';
 import Loader from '../../../components/Loader/Loader';
 import { PostApiWithOutToken } from '../../../api/helper';
 import { CommonActions } from '@react-navigation/native';
@@ -55,7 +55,7 @@ const StudentResetPassword = ({ navigation, route }) => {
             </Text>
             <Formik
               initialValues={{ new_password: '', confrimPassword: '' }}
-              validationSchema={ResetPassword}
+              validationSchema={ResetPasswordSchema}
               onSubmit={values => {
                 setisLoading(true);
                 // console.log('values', values);

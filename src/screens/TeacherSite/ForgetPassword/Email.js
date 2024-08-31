@@ -59,12 +59,12 @@ const Email = ({ navigation }) => {
                 const formdata = new FormData();
                 formdata.append('email', userEmail);
 
-                PostApiWithOutToken(`${BaseUrl}/api/student/forget`, formdata)
+                PostApiWithOutToken(`${BaseUrl}/api/teacher/forget`, formdata)
                   .then(res => {
                     console.log('res forgot===>', res?.data);
                     if (res?.data?.status) {
                       setisLoading(false);
-                      navigation.navigate('Otp');
+                      navigation.navigate('Otp', { email: userEmail });
                       showMessage({
                         message: 'Success',
                         description: res?.data?.response,

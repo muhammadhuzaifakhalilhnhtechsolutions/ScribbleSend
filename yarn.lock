@@ -2695,6 +2695,18 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@openspacelabs/react-native-zoomable-view@npm:^2.1.6":
+  version: 2.2.0
+  resolution: "@openspacelabs/react-native-zoomable-view@npm:2.2.0"
+  dependencies:
+    prop-types: ^15.7.2
+  peerDependencies:
+    react: ">=16.8.0"
+    react-native: ">=0.54.0"
+  checksum: 3227ec0954b52440ed3a69781582c08901df7a8fc265ceed4eef3d948a1826f4ccf293a45fe14d2f93e1d8863e5122563543ba506c11bfe37a3679f12ddb6027
+  languageName: node
+  linkType: hard
+
 "@pdf-lib/standard-fonts@npm:^1.0.0":
   version: 1.0.0
   resolution: "@pdf-lib/standard-fonts@npm:1.0.0"
@@ -3819,6 +3831,7 @@ __metadata:
     "@babel/core": ^7.20.0
     "@babel/preset-env": ^7.20.0
     "@babel/runtime": ^7.20.0
+    "@openspacelabs/react-native-zoomable-view": ^2.1.6
     "@react-native-async-storage/async-storage": ^1.19.3
     "@react-native-community/datetimepicker": ^8.2.0
     "@react-native-community/netinfo": ^11.3.2

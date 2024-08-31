@@ -1,5 +1,4 @@
 import * as yup from 'yup';
-// const reg = '^(?=.*[A-Za-z])(?=.*d)(?=.*[@$!%*#?&])[A-Za-zd@$!%*#?&]{6}$'
 const emailReg =
   /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/;
 const reg =
@@ -10,6 +9,7 @@ export const SignupSchema = yup.object({
   password: yup
     .string()
     .required('Please enter your password')
+    .min(8)
     .matches(
       reg,
       'Password must be between 8-16 characters long. e.g(Aa12@#).',
@@ -32,7 +32,7 @@ export const ForgotEmail = yup.object({
 });
 
 export const ChangePasswordSchema = yup.object({
-  currentPassword: yup.string().min(8).required('Please enter your password'),
+  currentPassword: yup.string().required('Please enter your password'),
   newPassword: yup
     .string()
     .min(8)
@@ -48,7 +48,7 @@ export const ChangePasswordSchema = yup.object({
     .oneOf([yup.ref('newPassword'), null], "Passwords doesn't match "),
 });
 
-export const ResetPassword = yup.object({
+export const ResetPasswordSchema = yup.object({
   new_password: yup
     .string()
     .min(8)

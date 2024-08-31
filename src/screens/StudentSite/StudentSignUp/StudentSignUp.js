@@ -33,11 +33,14 @@ import { showMessage } from 'react-native-flash-message';
 import BackHeader from '../../../components/ShortHeader/ShortHeader';
 import messaging from '@react-native-firebase/messaging';
 import { GoogleSignin } from '@react-native-google-signin/google-signin';
+import { useDispatch } from 'react-redux';
+import { updateUser } from '../../../stores/actions/userAction';
 
 const StudentSignUp = ({ navigation }) => {
   const [isLoading, setisLoading] = useState(false);
   const [fcmToken, setFcmToken] = useState('');
   const [userDetailsGoogle, setuserDetailsGoogle] = useState(null);
+  const dispatch = useDispatch();
 
   useEffect(() => {
     requestFCM();
@@ -113,6 +116,8 @@ const StudentSignUp = ({ navigation }) => {
                 formdata.append('name', values.FullName);
                 formdata.append('email', userEmail);
                 formdata.append('password', values.confrimPassword);
+                formdata.append('fcm_token', fcmToken);
+                formdata.append('device_type', Platform.OS);
 
                 PostApiWithOutTokenSignUp(
                   `${BaseUrl}/api/student/store`,
@@ -121,8 +126,8 @@ const StudentSignUp = ({ navigation }) => {
                   .then(res => {
                     console.log('res signup==>', res.data);
                     if (res.data?.status) {
-                      navigation.navigate('StudentLogin');
-                      // dispatch(updateUser(res.data));
+                      // navigation.navigate('StudentLogin');
+                      dispatch(updateUser(res.data));
                       setisLoading(false);
                       showMessage({
                         message: 'Success',

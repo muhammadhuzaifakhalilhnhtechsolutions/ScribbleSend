@@ -20,19 +20,76 @@ import {
 import Button from '../../../components/Button/Button';
 import { Black, THEME_COLOR, White } from '../../../utils/Color';
 import { PopingBold, PoppinsRegular } from '../../../utils/Fonts';
+import { PostApiWithOutToken } from '../../../api/helper';
+import { BaseUrl } from '../../../api/BaseUrl';
+import { CommonActions } from '@react-navigation/native';
+import { showMessage } from 'react-native-flash-message';
+import Loader from '../../../components/Loader/Loader';
 const { height, width } = Dimensions.get('screen');
-const Otp = ({ navigation, props }) => {
+
+const Otp = ({ navigation, route }) => {
   const CELL_COUNT = 4;
   const [value, setValue] = useState('');
+  const [isLoading, setisLoading] = useState(false);
   const ref = useBlurOnFulfill({ value, cellCount: CELL_COUNT });
   const [propsFiled, getCellOnLayoutHandler] = useClearByFocusCell({
     value,
     setValue,
   });
 
+  const handleSubmit = () => {
+    setisLoading(true);
+    const formdata = new FormData();
+    formdata.append('token', value);
+    formdata.append('email', route.params?.email);
+
+    PostApiWithOutToken(`${BaseUrl}/api/teacher/otp/verify`, formdata)
+      .then(res => {
+        console.log('res otp check==>', res.data);
+        if (res.data.status) {
+          setisLoading(false);
+          navigation.dispatch(
+            CommonActions.reset({
+              index: 1,
+              routes: [{ name: 'ResetPassword', params: value }],
+            }),
+          );
+          // navigation.navigate('StudentResetPassword');
+          showMessage({
+            message: 'Success',
+            description: 'OTP verified successfully',
+            type: 'success',
+            floating: true,
+            animated: true,
+          });
+        } else {
+          setisLoading(false);
+          showMessage({
+            message: 'Failed',
+            description: res.data?.error,
+            type: 'danger',
+            floating: true,
+            animated: true,
+          });
+        }
+      })
+      .catch(error => {
+        setisLoading(false);
+        console.log('error otp check==>', error);
+        showMessage({
+          message: 'Failed',
+          description: 'OTP mismatch!',
+          type: 'danger',
+          floating: true,
+          animated: true,
+        });
+      });
+  };
+
   return (
     <SafeAreaView style={styles.main}>
       <StatusBar backgroundColor={White} barStyle={'dark-content'} />
+      {isLoading && <Loader />}
       <ImageBackground
         style={styles.Backimg}
         source={require('../../../assets/images/background.png')}>
@@ -66,7 +123,7 @@ const Otp = ({ navigation, props }) => {
             </View>
             <View style={styles.underlineStyleBase}>
               <Button
-                onPress={() => navigation.navigate('ResetPassword')}
+                onPress={handleSubmit}
                 title={'Verification'}
                 style={styles.SigninButton}
               />
