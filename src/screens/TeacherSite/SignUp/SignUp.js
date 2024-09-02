@@ -25,7 +25,10 @@ import Button from '../../../components/Button/Button';
 import FastImage from 'react-native-fast-image';
 import { Formik } from 'formik';
 import { SignupSchema } from '../../../Schema/Schemas';
-import { PostApiWithOutTokenSignUp } from '../../../api/helper';
+import {
+  PostApiWithOutToken,
+  PostApiWithOutTokenSignUp,
+} from '../../../api/helper';
 import { BaseUrl } from '../../../api/BaseUrl';
 import Loader from '../../../components/Loader/Loader';
 import { showMessage } from 'react-native-flash-message';
@@ -37,7 +40,6 @@ import { updateUser } from '../../../stores/actions/userAction';
 const SignUp = ({ navigation }) => {
   const [isLoading, setisLoading] = useState(false);
   const [fcmToken, setFcmToken] = useState('');
-  const [userDetailsGoogle, setuserDetailsGoogle] = useState(null);
   const dispatch = useDispatch();
 
   useEffect(() => {
@@ -73,13 +75,61 @@ const SignUp = ({ navigation }) => {
 
   const signInWithGoogle = async () => {
     try {
+      setisLoading(true);
       await GoogleSignin.hasPlayServices();
       const userInfo = await GoogleSignin.signIn();
-      setuserDetailsGoogle({ userInfo });
+      const accessToken = (await GoogleSignin.getTokens()).accessToken;
+      handleFunctionGoogleSignin(accessToken);
       console.log('res google signin==>', userInfo);
+      console.log('res google accessToken==>', accessToken);
     } catch (error) {
+      setisLoading(false);
       console.log('error google signin==>', error);
     }
+  };
+
+  const handleFunctionGoogleSignin = value => {
+    const formdata = new FormData();
+    formdata.append('type', 'teacher');
+    formdata.append('access_token', value);
+    formdata.append('fcm_token', fcmToken);
+    formdata.append('device_type', Platform.OS);
+
+    PostApiWithOutToken(`${BaseUrl}/api/google/signIn`, formdata)
+      .then(res => {
+        console.log('login google res==>', res.data);
+        if (res.data?.status) {
+          dispatch(updateUser(res?.data));
+          setisLoading(false);
+          showMessage({
+            message: 'Success',
+            description: 'Login successful',
+            type: 'success',
+            animated: true,
+            floating: true,
+          });
+        } else {
+          setisLoading(false);
+          showMessage({
+            message: 'Failed',
+            description: res?.data?.error,
+            type: 'danger',
+            animated: true,
+            floating: true,
+          });
+        }
+      })
+      .catch(error => {
+        console.log('err login google===>', error);
+        setisLoading(false);
+        showMessage({
+          message: 'Failed',
+          description: 'Something went wrong! Please try again later.',
+          type: 'danger',
+          animated: true,
+          floating: true,
+        });
+      });
   };
 
   return (

@@ -41,6 +41,8 @@ const Dashboard = ({ navigation }) => {
   const [filterData, setfilterData] = useState([]);
   const [searchLoader, setsearchLoader] = useState(false);
 
+  console.log('userdata==>',userData);
+
   useEffect(() => {
     getAssissments();
     getCount();
