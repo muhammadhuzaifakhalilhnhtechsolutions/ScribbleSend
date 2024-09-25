@@ -5,6 +5,7 @@ import {
   PermissionsAndroid,
   Platform,
   SafeAreaView,
+  ScrollView,
   StatusBar,
   StyleSheet,
   ToastAndroid,
@@ -29,8 +30,9 @@ import { encode } from 'base64-arraybuffer';
 import Loader from '../../../components/Loader/Loader';
 import { showMessage } from 'react-native-flash-message';
 import { ReactNativeZoomableView } from '@openspacelabs/react-native-zoomable-view';
+import OrientationLocker from 'react-native-orientation-locker';
 
-const { height, width } = Dimensions.get('screen');
+const { height, width } = Dimensions.get('window');
 
 const StaticWhiteBoard = ({ navigation }) => {
   const [textDataList, setTextDataList] = useState([]);
@@ -40,13 +42,17 @@ const StaticWhiteBoard = ({ navigation }) => {
   const [isRecording, setisRecording] = useState(false);
   const [androidVersion, setAndroidVersion] = useState('');
   const [shareLoading, setshareLoading] = useState(false);
-  const [drawingAreaSize, setDrawingAreaSize] = useState({
-    width: width,
-    height: height,
-  });
-
+  const [drawingPage, setDrawingPage] = useState(2);
   const svgRef = useRef(null);
   const textInputRef = useRef(null);
+
+  useEffect(() => {
+    OrientationLocker.lockToLandscape();
+
+    return () => {
+      OrientationLocker.lockToPortrait();
+    };
+  }, []);
 
   useEffect(() => {
     const version = DeviceInfo.getSystemVersion();
@@ -120,10 +126,10 @@ const StaticWhiteBoard = ({ navigation }) => {
   const createNewTextData = () => ({
     id: textDataList?.length + 1,
     text: '',
-    color: 'black',
+    color: '#000000',
     size: 16,
-    x: width / 2.6,
-    y: drawingAreaSize.height / 2.6,
+    x: width / 2.5,
+    y: height / 2,
   });
 
   const requestPermissions = async value => {
@@ -281,7 +287,7 @@ const StaticWhiteBoard = ({ navigation }) => {
           .catch(err => {
             Alert.alert(
               'Success',
-              `PDF doesn't share but saved successfully in Downloadq  s as ${uniqueFilename}!`,
+              `PDF doesn't share but saved successfully in Download as ${uniqueFilename}!`,
             );
             setshareLoading(false);
           });
@@ -309,141 +315,192 @@ const StaticWhiteBoard = ({ navigation }) => {
     }
   };
 
+  const addPages = () => {
+    setDrawingPage(() => drawingPage + 1);
+  };
+
+  const handleErase = () => {};
+
   return (
     <SafeAreaView style={styles.container}>
       {shareLoading && <Loader />}
       <StatusBar barStyle={'dark-content'} backgroundColor={White} />
       <View style={styles.main}>
-        <ReactNativeZoomableView
-          maxZoom={6}
-          minZoom={0.8}
-          zoomStep={0.5}
-          initialZoom={1}
-          bindToBorders={true}>
-          <View ref={svgRef} style={{ flex: 1 }}>
-            <TouchableOpacity
-              style={{
-                ...styles.functionButton,
-                position: 'absolute',
-                left: '10%',
-                zIndex: 1,
-              }}
-              onPress={addNewText}>
-              <MaterialCommunityIcons
-                name="format-text"
-                size={20}
-                color={White}
-              />
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={{
-                ...styles.functionButton,
-                position: 'absolute',
-                left: '20%',
-                zIndex: 1,
-              }}
-              onPress={() => {
-                isRecording ? stopRecording() : requestPermissions('recording');
-              }}>
-              <MaterialCommunityIcons
-                name={isRecording ? 'stop' : 'record'}
-                size={26}
-                color={'red'}
-              />
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={{
-                ...styles.functionButton,
-                position: 'absolute',
-                left: '30%',
-                zIndex: 1,
-              }}
-              onPress={() => {
-                handleFunctions('share');
-              }}>
-              <MaterialCommunityIcons name="share" size={24} color={White} />
-            </TouchableOpacity>
-            <RNSketchCanvas
-              containerStyle={{ backgroundColor: 'transparent', flex: 1 }}
-              canvasStyle={{ backgroundColor: '#EEE', flex: 1 }}
-              defaultStrokeIndex={0}
-              defaultStrokeWidth={3}
-              onClearPressed={() => setTextDataList([])}
-              undoComponent={
-                <View style={styles.functionButton}>
-                  <MaterialCommunityIcons name="undo" size={20} color={White} />
-                </View>
-              }
-              clearComponent={
-                <View style={styles.functionButton}>
-                  <MaterialCommunityIcons
-                    name="delete"
-                    size={20}
-                    color={White}
-                  />
-                </View>
-              }
-              eraseComponent={
-                <View style={styles.functionButton}>
-                  <MaterialCommunityIcons
-                    name="eraser"
-                    size={20}
-                    color={White}
-                  />
-                </View>
-              }
-              strokeComponent={color => (
-                <View
-                  style={[
-                    {
-                      backgroundColor: color,
-                    },
-                    styles.strokeColorButton,
-                  ]}
+        <ScrollView nestedScrollEnabled={false}>
+          <ReactNativeZoomableView
+            bindToBorders={true}
+            maxZoom={6}
+            minZoom={0.9}
+            zoomStep={0.5}
+            initialZoom={1}>
+            <View ref={svgRef} style={{ flex: 1, width: '100%' }}>
+              {/* <TouchableOpacity
+                style={{
+                  ...styles.functionButton,
+                  position: 'absolute',
+                  // left: width * 0.045,
+                  left: 0,
+                  top: 0,
+                  zIndex: 1,
+                }}
+                onPress={handleErase}>
+                <MaterialCommunityIcons name="eraser" size={20} color={White} />
+              </TouchableOpacity> */}
+              <TouchableOpacity
+                style={{
+                  ...styles.functionButton,
+                  position: 'absolute',
+                  // left: width * 0.045,
+                  left: 0,
+                  top: 0,
+                  zIndex: 1,
+                }}
+                onPress={addNewText}>
+                <MaterialCommunityIcons
+                  name="format-text"
+                  size={20}
+                  color={White}
                 />
-              )}
-              strokeSelectedComponent={(color, index, changed) => {
-                return (
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={{
+                  ...styles.functionButton,
+                  position: 'absolute',
+                  left: 35,
+                  top: 0,
+                  zIndex: 1,
+                }}
+                onPress={() => {
+                  isRecording
+                    ? stopRecording()
+                    : requestPermissions('recording');
+                }}>
+                <MaterialCommunityIcons
+                  name={isRecording ? 'stop' : 'record'}
+                  size={26}
+                  color={'red'}
+                />
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={{
+                  ...styles.functionButton,
+                  position: 'absolute',
+                  left: 70,
+                  top: 0,
+                  zIndex: 1,
+                }}
+                onPress={() => {
+                  handleFunctions('share');
+                }}>
+                <MaterialCommunityIcons name="share" size={24} color={White} />
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={{
+                  ...styles.functionButton,
+                  position: 'absolute',
+                  // left: width * 0.045,
+                  left: 105,
+                  top: 0,
+                  zIndex: 1,
+                }}
+                onPress={addPages}>
+                <MaterialCommunityIcons name="plus" size={20} color={White} />
+              </TouchableOpacity>
+              <RNSketchCanvas
+                containerStyle={{
+                  backgroundColor: 'transparent',
+                  width: '100%',
+                  flex: 1,
+                }}
+                canvasStyle={{
+                  backgroundColor: '#EEE',
+                  height: height * 2 * drawingPage,
+                  width: '100%',
+                }}
+                defaultStrokeIndex={0}
+                defaultStrokeWidth={2}
+                onClearPressed={() => setTextDataList([])}
+                undoComponent={
+                  <View style={styles.functionButton}>
+                    <MaterialCommunityIcons
+                      name="eraser"
+                      size={20}
+                      color={White}
+                    />
+                  </View>
+                }
+                clearComponent={
+                  <View style={styles.functionButton}>
+                    <MaterialCommunityIcons
+                      name="delete"
+                      size={20}
+                      color={White}
+                    />
+                  </View>
+                }
+                // eraseComponent={
+                //   <View style={styles.functionButton}>
+                //     <MaterialCommunityIcons
+                //       name="eraser"
+                //       size={20}
+                //       color={White}
+                //     />
+                //   </View>
+                // }
+                strokeComponent={color => (
                   <View
                     style={[
-                      { backgroundColor: color, borderWidth: 2 },
+                      {
+                        backgroundColor: color,
+                      },
                       styles.strokeColorButton,
                     ]}
                   />
-                );
-              }}
-              strokeWidthComponent={w => {
-                return (
-                  <View style={styles.strokeWidthButton}>
+                )}
+                strokeSelectedComponent={(color, index, changed) => {
+                  return (
                     <View
-                      style={{
-                        backgroundColor: 'white',
-                        marginHorizontal: 2.5,
-                        width: Math.sqrt(w / 3) * 10,
-                        height: Math.sqrt(w / 3) * 10,
-                        borderRadius: (Math.sqrt(w / 3) * 10) / 2,
-                      }}
+                      style={[
+                        { backgroundColor: color, borderWidth: 2 },
+                        styles.strokeColorButton,
+                      ]}
                     />
-                  </View>
-                );
-              }}
-            />
-            {textDataList.map(textData => (
-              <DraggableText
-                key={textData.id}
-                textData={textData}
-                textDataList={textDataList}
-                setTextDataList={setTextDataList}
-                isSelected={textData.id == selectedTextId}
-                onSelectText={handleSelectText}
-                onStartDrag={() => setSelectedTextId(() => textData.id)}
-                onEndDrag={() => setSelectedTextId(() => null)}
-                handleEditText={handleEditText}
-                handleDeleteText={handleDeleteText}
+                  );
+                }}
+                strokeWidthComponent={w => {
+                  return (
+                    <View style={styles.strokeWidthButton}>
+                      <View
+                        style={{
+                          backgroundColor: 'white',
+                          marginHorizontal: 2.5,
+                          width: Math.sqrt(w / 3) * 10,
+                          height: Math.sqrt(w / 3) * 10,
+                          borderRadius: (Math.sqrt(w / 3) * 10) / 2,
+                        }}
+                      />
+                    </View>
+                  );
+                }}
               />
-            ))}
-          </View>
-        </ReactNativeZoomableView>
+
+              {textDataList.map(textData => (
+                <DraggableText
+                  key={textData.id}
+                  textData={textData}
+                  textDataList={textDataList}
+                  setTextDataList={setTextDataList}
+                  isSelected={textData.id == selectedTextId}
+                  onSelectText={handleSelectText}
+                  onStartDrag={() => setSelectedTextId(() => textData.id)}
+                  onEndDrag={() => setSelectedTextId(() => null)}
+                  handleEditText={handleEditText}
+                  handleDeleteText={handleDeleteText}
+                />
+              ))}
+            </View>
+          </ReactNativeZoomableView>
+        </ScrollView>
 
         <TextModal
           modalVisibleText={modalVisibleText}
@@ -470,7 +527,7 @@ const styles = StyleSheet.create({
   },
   main: {
     flex: 1,
-    width: '96%',
+    width: '98%',
     alignSelf: 'center',
     backgroundColor: White,
   },

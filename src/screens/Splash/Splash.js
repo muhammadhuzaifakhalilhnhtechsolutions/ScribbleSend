@@ -1,4 +1,5 @@
 import {
+  Dimensions,
   ImageBackground,
   StatusBar,
   StyleSheet,
@@ -11,6 +12,8 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import FastImage from 'react-native-fast-image';
 import { PopingBold, PoppinsRegular } from '../../utils/Fonts';
 
+const { height } = Dimensions.get('screen');
+
 const Splash = ({ navigation }) => {
   return (
     <SafeAreaView style={styles.Main}>
@@ -21,7 +24,7 @@ const Splash = ({ navigation }) => {
         <View style={styles.ImageDiv}>
           <FastImage
             style={{ height: '80%', width: '70%' }}
-            source={require('../../assets/images/Logo.png')}
+            source={require('../../assets/images/logoBlack.png')}
             resizeMode="contain"
           />
         </View>
@@ -47,7 +50,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   ImageDiv: {
-    height: 110,
+    height: height * 0.3,
     width: '100%',
     alignItems: 'center',
     justifyContent: 'center',

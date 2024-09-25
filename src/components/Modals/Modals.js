@@ -1,5 +1,6 @@
 import {
   Modal,
+  ScrollView,
   StyleSheet,
   Text,
   TextInput,
@@ -10,7 +11,28 @@ import React from 'react';
 import Slider from '@react-native-community/slider';
 import { Black, Gray, THEME_COLOR, White } from '../../utils/Color';
 
-const colors = [Black, 'red', 'blue', 'green', 'yellow'];
+// const colors = [Black, 'red', 'blue', 'green', 'yellow'];
+// strokeColors:
+const colors = [
+  '#000000',
+  '#FF0000',
+  '#00FFFF',
+  '#0000FF',
+  '#0000A0',
+  '#ADD8E6',
+  '#800080',
+  '#FFFF00',
+  '#00FF00',
+  '#FF00FF',
+  '#FFFFFF',
+  '#C0C0C0',
+  '#808080',
+  '#FFA500',
+  '#A52A2A',
+  '#800000',
+  '#008000',
+  '#808000',
+];
 
 const TextModal = ({
   modalVisibleText,
@@ -32,9 +54,12 @@ const TextModal = ({
 
           <Text style={styles.modalTitle}>Text Settings</Text>
           <Text style={styles.textStyle}>
-            Text Size: {textDataList[activeTextIndex]?.color}
+            Text Colour: {textDataList[activeTextIndex]?.color}
           </Text>
-          <View style={styles.colorContainer}>
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            style={styles.colorContainer}>
             {colors?.map((color, index) => (
               <TouchableOpacity
                 key={index}
@@ -47,7 +72,7 @@ const TextModal = ({
                 ]}
               />
             ))}
-          </View>
+          </ScrollView>
           <View style={styles.sliderContainer}>
             <Text style={styles.textStyle}>
               Text Size: {textDataList[activeTextIndex]?.size?.toFixed(0)}
@@ -105,7 +130,10 @@ const PenModal = ({
 
           <Text style={styles.modalTitle}>Pen Settings</Text>
           <Text style={styles.textStyle}>Pen Colour: {penColor}</Text>
-          <View style={styles.colorContainer}>
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            style={styles.colorContainer}>
             {colors.map((color, index) => (
               <TouchableOpacity
                 key={index}
@@ -117,7 +145,7 @@ const PenModal = ({
                 ]}
               />
             ))}
-          </View>
+          </ScrollView>
           <View style={styles.sliderContainer}>
             <Text style={styles.textStyle}>
               Pen Width: {penWidth?.toFixed(0)}
