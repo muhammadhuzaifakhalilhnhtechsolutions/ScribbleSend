@@ -11,9 +11,11 @@ import {
   ToastAndroid,
   TouchableOpacity,
   View,
+  Text,
+  Image,
 } from 'react-native';
 import React, { useState, useRef, useEffect } from 'react';
-import { THEME_COLOR, White } from '../../../utils/Color';
+import { Black, THEME_COLOR, White } from '../../../utils/Color';
 import RNSketchCanvas from '@sourcetoad/react-native-sketch-canvas';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import RNFS from 'react-native-fs';
@@ -31,6 +33,7 @@ import Loader from '../../../components/Loader/Loader';
 import { showMessage } from 'react-native-flash-message';
 import { ReactNativeZoomableView } from '@openspacelabs/react-native-zoomable-view';
 import OrientationLocker from 'react-native-orientation-locker';
+import { PopingBold } from '../../../utils/Fonts';
 
 const { height, width } = Dimensions.get('window');
 
@@ -45,10 +48,10 @@ const StaticWhiteBoard = ({ navigation }) => {
   const [drawingPage, setDrawingPage] = useState(2);
   const svgRef = useRef(null);
   const textInputRef = useRef(null);
+  const canvasRef = useRef();
 
   useEffect(() => {
     OrientationLocker.lockToLandscape();
-
     return () => {
       OrientationLocker.lockToPortrait();
     };
@@ -319,187 +322,205 @@ const StaticWhiteBoard = ({ navigation }) => {
     setDrawingPage(() => drawingPage + 1);
   };
 
-  const handleErase = () => {};
-
   return (
     <SafeAreaView style={styles.container}>
       {shareLoading && <Loader />}
       <StatusBar barStyle={'dark-content'} backgroundColor={White} />
       <View style={styles.main}>
+        <View style={[styles.scrollIndicator]}>
+          <MaterialCommunityIcons
+            name="arrow-up"
+            color={THEME_COLOR}
+            size={30}
+          />
+          <MaterialCommunityIcons
+            name="arrow-down"
+            color={THEME_COLOR}
+            size={30}
+          />
+        </View>
+        <View style={styles.btnCOntainer}>
+          <View style={styles.btnBox}>
+            <TouchableOpacity
+              style={styles.functionButton}
+              onPress={addNewText}>
+              <Image
+                source={require('../../../assets/images/textool.png')}
+                style={{ height: 30, width: 30 }}
+                resizeMode="contain"
+              />
+            </TouchableOpacity>
+            <Text style={styles.btnText}>Add text </Text>
+          </View>
+          <View style={styles.btnBox}>
+            <TouchableOpacity
+              style={{ ...styles.functionButton, backgroundColor: '#c0c0c0' }}
+              onPress={() => {
+                isRecording ? stopRecording() : requestPermissions('recording');
+              }}>
+              <MaterialCommunityIcons
+                name={isRecording ? 'stop' : 'record'}
+                size={26}
+                color={'red'}
+              />
+            </TouchableOpacity>
+            <Text style={styles.btnText}>Recording</Text>
+          </View>
+          <View style={styles.btnBox}>
+            <TouchableOpacity
+              style={styles.functionButton}
+              onPress={() => handleFunctions('share')}>
+              <Image
+                source={require('../../../assets/images/share.png')}
+                style={{ height: 30, width: 30 }}
+                resizeMode="contain"
+              />
+            </TouchableOpacity>
+            <Text style={styles.btnText}>share</Text>
+          </View>
+          <View style={styles.btnBox}>
+            <TouchableOpacity style={styles.functionButton} onPress={addPages}>
+              <Image
+                source={require('../../../assets/images/addDocument.png')}
+                style={{ height: 30, width: 30 }}
+                resizeMode="contain"
+              />
+            </TouchableOpacity>
+            <Text style={styles.btnText}>Add page</Text>
+          </View>
+          <View style={styles.btnBox}>
+            <TouchableOpacity
+              style={styles.functionButton}
+              onPress={() => {
+                canvasRef.current?.clear();
+                setTextDataList([]);
+              }}>
+              <Image
+                source={require('../../../assets/images/refresh.png')}
+                style={{ height: 30, width: 30 }}
+                resizeMode="contain"
+              />
+            </TouchableOpacity>
+            <Text style={styles.btnText}>clear</Text>
+          </View>
+          <View style={styles.btnBox}>
+            <TouchableOpacity
+              style={{ ...styles.functionButton, backgroundColor: null }}
+              onPress={() => {
+                canvasRef.current?.undo();
+              }}>
+              <Image
+                source={require('../../../assets/images/eraser.png')}
+                style={{ height: 30, width: 30 }}
+                resizeMode="contain"
+              />
+            </TouchableOpacity>
+            <Text style={styles.btnText}>erase</Text>
+          </View>
+        </View>
         <ScrollView nestedScrollEnabled={false}>
-          <ReactNativeZoomableView
+          {/* <ReactNativeZoomableView
             bindToBorders={true}
             maxZoom={6}
             minZoom={0.9}
             zoomStep={0.5}
-            initialZoom={1}>
-            <View ref={svgRef} style={{ flex: 1, width: '100%' }}>
-              {/* <TouchableOpacity
-                style={{
-                  ...styles.functionButton,
-                  position: 'absolute',
-                  // left: width * 0.045,
-                  left: 0,
-                  top: 0,
-                  zIndex: 1,
-                }}
-                onPress={handleErase}>
-                <MaterialCommunityIcons name="eraser" size={20} color={White} />
-              </TouchableOpacity> */}
-              <TouchableOpacity
-                style={{
-                  ...styles.functionButton,
-                  position: 'absolute',
-                  // left: width * 0.045,
-                  left: 0,
-                  top: 0,
-                  zIndex: 1,
-                }}
-                onPress={addNewText}>
-                <MaterialCommunityIcons
-                  name="format-text"
-                  size={20}
-                  color={White}
+            initialZoom={1}> */}
+          <View ref={svgRef} style={{ flex: 1, width: '96%', marginTop: 5 }}>
+            <RNSketchCanvas
+              ref={canvasRef}
+              containerStyle={{
+                backgroundColor: 'transparent',
+                width: '100%',
+                flex: 1,
+              }}
+              canvasStyle={{
+                backgroundColor: '#EEE',
+                height: height * 2 * drawingPage,
+                width: '100%',
+              }}
+              defaultStrokeIndex={0}
+              defaultStrokeWidth={2}
+              // onClearPressed={() => setTextDataList([])}
+              // undoComponent={
+              //   <View style={styles.functionButton}>
+              //     <MaterialCommunityIcons
+              //       name="eraser"
+              //       size={20}
+              //       color={White}
+              //     />
+              //   </View>
+              // }
+              // clearComponent={
+              //   <View style={styles.functionButton}>
+              //     <MaterialCommunityIcons
+              //       name="delete"
+              //       size={20}
+              //       color={White}
+              //     />
+              //   </View>
+              // }
+              // eraseComponent={
+              //   <View style={styles.functionButton}>
+              //     <MaterialCommunityIcons
+              //       name="eraser"
+              //       size={20}
+              //       color={White}
+              //     />
+              //   </View>
+              // }
+              strokeComponent={color => (
+                <View
+                  style={[
+                    {
+                      backgroundColor: color,
+                    },
+                    styles.strokeColorButton,
+                  ]}
                 />
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={{
-                  ...styles.functionButton,
-                  position: 'absolute',
-                  left: 35,
-                  top: 0,
-                  zIndex: 1,
-                }}
-                onPress={() => {
-                  isRecording
-                    ? stopRecording()
-                    : requestPermissions('recording');
-                }}>
-                <MaterialCommunityIcons
-                  name={isRecording ? 'stop' : 'record'}
-                  size={26}
-                  color={'red'}
-                />
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={{
-                  ...styles.functionButton,
-                  position: 'absolute',
-                  left: 70,
-                  top: 0,
-                  zIndex: 1,
-                }}
-                onPress={() => {
-                  handleFunctions('share');
-                }}>
-                <MaterialCommunityIcons name="share" size={24} color={White} />
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={{
-                  ...styles.functionButton,
-                  position: 'absolute',
-                  // left: width * 0.045,
-                  left: 105,
-                  top: 0,
-                  zIndex: 1,
-                }}
-                onPress={addPages}>
-                <MaterialCommunityIcons name="plus" size={20} color={White} />
-              </TouchableOpacity>
-              <RNSketchCanvas
-                containerStyle={{
-                  backgroundColor: 'transparent',
-                  width: '100%',
-                  flex: 1,
-                }}
-                canvasStyle={{
-                  backgroundColor: '#EEE',
-                  height: height * 2 * drawingPage,
-                  width: '100%',
-                }}
-                defaultStrokeIndex={0}
-                defaultStrokeWidth={2}
-                onClearPressed={() => setTextDataList([])}
-                undoComponent={
-                  <View style={styles.functionButton}>
-                    <MaterialCommunityIcons
-                      name="eraser"
-                      size={20}
-                      color={White}
-                    />
-                  </View>
-                }
-                clearComponent={
-                  <View style={styles.functionButton}>
-                    <MaterialCommunityIcons
-                      name="delete"
-                      size={20}
-                      color={White}
-                    />
-                  </View>
-                }
-                // eraseComponent={
-                //   <View style={styles.functionButton}>
-                //     <MaterialCommunityIcons
-                //       name="eraser"
-                //       size={20}
-                //       color={White}
-                //     />
-                //   </View>
-                // }
-                strokeComponent={color => (
-                  <View
-                    style={[
-                      {
-                        backgroundColor: color,
-                      },
-                      styles.strokeColorButton,
-                    ]}
-                  />
-                )}
-                strokeSelectedComponent={(color, index, changed) => {
-                  return (
-                    <View
-                      style={[
-                        { backgroundColor: color, borderWidth: 2 },
-                        styles.strokeColorButton,
-                      ]}
-                    />
-                  );
-                }}
-                strokeWidthComponent={w => {
-                  return (
-                    <View style={styles.strokeWidthButton}>
-                      <View
-                        style={{
-                          backgroundColor: 'white',
-                          marginHorizontal: 2.5,
-                          width: Math.sqrt(w / 3) * 10,
-                          height: Math.sqrt(w / 3) * 10,
-                          borderRadius: (Math.sqrt(w / 3) * 10) / 2,
-                        }}
-                      />
-                    </View>
-                  );
-                }}
-              />
+              )}
+              // strokeSelectedComponent={(color, index, changed) => {
+              //   return (
+              //     <View
+              //       style={[
+              //         { backgroundColor: color, borderWidth: 2 },
+              //         styles.strokeColorButton,
+              //       ]}
+              //     />
+              //   );
+              // }}
+              // strokeWidthComponent={w => {
+              //   return (
+              //     <View style={styles.strokeWidthButton}>
+              //       <View
+              //         style={{
+              //           backgroundColor: 'white',
+              //           marginHorizontal: 2.5,
+              //           width: Math.sqrt(w / 3) * 10,
+              //           height: Math.sqrt(w / 3) * 10,
+              //           borderRadius: (Math.sqrt(w / 3) * 10) / 2,
+              //         }}
+              //       />
+              //     </View>
+              //   );
+              // }}
+            />
 
-              {textDataList.map(textData => (
-                <DraggableText
-                  key={textData.id}
-                  textData={textData}
-                  textDataList={textDataList}
-                  setTextDataList={setTextDataList}
-                  isSelected={textData.id == selectedTextId}
-                  onSelectText={handleSelectText}
-                  onStartDrag={() => setSelectedTextId(() => textData.id)}
-                  onEndDrag={() => setSelectedTextId(() => null)}
-                  handleEditText={handleEditText}
-                  handleDeleteText={handleDeleteText}
-                />
-              ))}
-            </View>
-          </ReactNativeZoomableView>
+            {textDataList.map(textData => (
+              <DraggableText
+                key={textData.id}
+                textData={textData}
+                textDataList={textDataList}
+                setTextDataList={setTextDataList}
+                isSelected={textData.id == selectedTextId}
+                onSelectText={handleSelectText}
+                onStartDrag={() => setSelectedTextId(() => textData.id)}
+                onEndDrag={() => setSelectedTextId(() => null)}
+                handleEditText={handleEditText}
+                handleDeleteText={handleDeleteText}
+              />
+            ))}
+          </View>
+          {/* </ReactNativeZoomableView> */}
         </ScrollView>
 
         <TextModal
@@ -547,15 +568,45 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: THEME_COLOR,
+    zIndex: 1,
+    position: 'absolute',
+    bottom: 3,
+    right: 3,
   },
   functionButton: {
     marginHorizontal: 2.5,
-    marginVertical: 8,
     height: 30,
     width: 30,
-    backgroundColor: THEME_COLOR,
     justifyContent: 'center',
     alignItems: 'center',
     borderRadius: 5,
+  },
+  btnCOntainer: {
+    width: '96%',
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-around',
+    paddingTop: 5,
+  },
+  btnBox: {
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  btnText: {
+    color: Black,
+    fontSize: 10,
+    fontFamily: PopingBold,
+    textTransform: 'uppercase',
+  },
+  scrollIndicator: {
+    position: 'absolute',
+    width: 28,
+    top: 0,
+    right: 0,
+    borderRadius: 5,
+    justifyContent: 'space-around',
+    alignItems: 'center',
+    alignSelf: 'center',
+    height: height * 0.93,
   },
 });

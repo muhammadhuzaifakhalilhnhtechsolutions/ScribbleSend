@@ -2,7 +2,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import React from 'react';
 import StudentNotification from '../screens/StudentSite/Notification/StudentNotification';
 import StudentHome from '../screens/StudentSite/StudentHome/StudentHome';
-import WhiteBoard from '../screens/StudentSite/WhiteBoard/WhiteBoard';
+// import WhiteBoard from '../screens/StudentSite/WhiteBoard/WhiteBoard';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import Icon from 'react-native-vector-icons/Ionicons';
 import ScribbleBottom from './ScribbleBottom';
