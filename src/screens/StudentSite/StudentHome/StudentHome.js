@@ -9,7 +9,6 @@ import {
   Text,
   TouchableOpacity,
   TextInput,
-  FlatList,
   Dimensions,
   RefreshControl,
   Keyboard,
@@ -17,21 +16,21 @@ import {
 } from 'react-native';
 import { THEME_COLOR, THEME_COLOR_LIGHT } from '../../../utils/Color';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-import DateTimePickerModal from 'react-native-modal-datetime-picker';
+// import DateTimePickerModal from 'react-native-modal-datetime-picker';
 import moment from 'moment';
 import { styles } from './HomeStyles';
 import { getApiWithToken } from '../../../api/helper';
 import { BaseUrl } from '../../../api/BaseUrl';
 import { useSelector } from 'react-redux';
 import Loader from '../../../components/Loader/Loader';
-import { PopingBold } from '../../../utils/Fonts';
 import { showMessage } from 'react-native-flash-message';
+
 const { height } = Dimensions.get('screen');
 
 const StudentHome = ({ navigation }) => {
   const [searches, setsearches] = useState('');
-  const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
-  const [date, setdate] = useState(moment().format('YYYY-MM-DD'));
+  // const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
+  // const [date, setdate] = useState(moment().format('YYYY-MM-DD'));
   const userData = useSelector(state => state.userReducer.user.data);
   const [savedAssissments, setSavedAssissments] = useState([]);
   const [isLoading, setisLoading] = useState(false);
@@ -107,15 +106,15 @@ const StudentHome = ({ navigation }) => {
       });
   };
 
-  const hideDatePicker = () => {
-    setDatePickerVisibility(false);
-  };
+  // const hideDatePicker = () => {
+  //   setDatePickerVisibility(false);
+  // };
 
-  const handleConfirm = date => {
-    const formattedDate = moment(date).format('YYYY-MM-DD');
-    setdate(() => formattedDate);
-    hideDatePicker();
-  };
+  // const handleConfirm = date => {
+  //   const formattedDate = moment(date).format('YYYY-MM-DD');
+  //   setdate(() => formattedDate);
+  //   hideDatePicker();
+  // };
 
   const handleSearched = data => {
     if (data.trim() == '') {
@@ -125,7 +124,7 @@ const StudentHome = ({ navigation }) => {
       setsearches(data);
       setsearchLoader(true);
       getApiWithToken(
-        `${BaseUrl}/api/student/teachers/assessments?name=${data}&date=${date}`,
+        `${BaseUrl}/api/student/teachers/assessments?username=${data}`,
         '',
         userData?.token,
       )
@@ -165,7 +164,7 @@ const StudentHome = ({ navigation }) => {
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
         <ScrollView showsVerticalScrollIndicator={false}>
           <View style={styles.userDiv}>
-            <Text style={styles.usernames}>Hi {userData.name}</Text>
+            <Text style={styles.usernames}>Hi {userData.fname}</Text>
             <Text style={styles.userDetails}>Here is your activity today,</Text>
             <TouchableOpacity
               style={styles.notiDiv}
@@ -188,23 +187,24 @@ const StudentHome = ({ navigation }) => {
               cursorColor={THEME_COLOR}
               selectionColor={THEME_COLOR_LIGHT}
             />
-            <TouchableOpacity
+            {/* <TouchableOpacity
               style={styles.calenderBtn}
               onPress={() => setDatePickerVisibility(true)}>
               <Text style={{ ...styles.userDetails, fontFamily: PopingBold }}>
                 {moment(date).format('DD/MM')}
               </Text>
               <Ionicons name="calendar" size={24} color={THEME_COLOR} />
-            </TouchableOpacity>
+            </TouchableOpacity> */}
           </View>
 
           <View style={styles.divBox}>
             <View style={styles.divBox1}>
               <View style={styles.divBox2}>
                 <Text style={{ ...styles.text1, color: '#B4530A' }}>
-                  {allCounts?.presence}
+                  {/* {allCounts?.presence} */}
+                  {userData.teacher?.length}
                 </Text>
-                <Text style={styles.text2}>Presence</Text>
+                <Text style={styles.text2}>Enroll Teachers</Text>
               </View>
               <View style={styles.divBox2}>
                 <Text style={{ ...styles.text1, color: '#4078D3' }}>
@@ -300,12 +300,12 @@ const StudentHome = ({ navigation }) => {
             )}
           </View>
 
-          <DateTimePickerModal
+          {/* <DateTimePickerModal
             isVisible={isDatePickerVisible}
             mode="date"
             onConfirm={handleConfirm}
             onCancel={hideDatePicker}
-          />
+          /> */}
         </ScrollView>
       </KeyboardAvoidingView>
     </SafeAreaView>

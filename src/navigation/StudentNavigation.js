@@ -12,6 +12,7 @@ import StudentEditProfile from '../screens/StudentSite/StudentEditProfile/Studen
 import StudentChangePassword from '../screens/StudentSite/StudentChangePass/StudentChangePassword';
 import StudentTerms from '../screens/StudentSite/StudentTerms/StudentTerms';
 import StaticWhiteBoard from '../screens/StudentSite/WhiteBoard/StaticWhiteBoard';
+import TestDraw from '../screens/StudentSite/WhiteBoard/TestDraw';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -53,15 +54,15 @@ const StudentNavigation = () => {
         options={{ headerShown: false }}
         component={MyTabs}
       />
-      {/* <Stack.Screen
-        name="WhiteBoard"
-        options={{ headerShown: false }}
-        component={WhiteBoard}
-      /> */}
       <Stack.Screen
         name="WhiteBoard"
         options={{ headerShown: false }}
         component={StaticWhiteBoard}
+      />
+      <Stack.Screen
+        name="TestDraw"
+        options={{ headerShown: false }}
+        component={TestDraw}
       />
       <Stack.Screen
         name="StudentNotification"

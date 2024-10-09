@@ -1,6 +1,5 @@
 import {
   StyleSheet,
-  Text,
   View,
   TextInput,
   TouchableOpacity,
@@ -27,6 +26,8 @@ const Input = ({
   multiline,
   onBlur,
   editable,
+  keyboardType,
+  maxLength,
 }) => {
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
   const isPassword = placeholder.toLowerCase().includes('password');
@@ -49,6 +50,8 @@ const Input = ({
         multiline={multiline}
         onBlur={onBlur}
         editable={editable}
+        maxLength={maxLength}
+        keyboardType={keyboardType}
         secureTextEntry={isPassword && !isPasswordVisible}
         style={[
           { ...styles.inputstyles, paddingRight: isPassword ? 40 : 0 },

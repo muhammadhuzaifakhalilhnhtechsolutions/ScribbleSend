@@ -31,6 +31,11 @@ const DATA = [
     name: 'Terms & Conditions',
     goTo: 'StudentTerms',
   },
+  {
+    id: 3,
+    name: 'Whiteboard',
+    goTo: 'TestDraw',
+  },
 ];
 
 const StudentSettings = ({ navigation }) => {
@@ -77,7 +82,7 @@ const StudentSettings = ({ navigation }) => {
                 style={styles.userImage}
                 resizeMode="cover"
               />
-              <Text style={styles.userName}>{userData?.name}</Text>
+              <Text style={styles.userName}>{userData?.fname}</Text>
               <Button
                 title="Edit Profile"
                 textStyle={styles.titleStyle}

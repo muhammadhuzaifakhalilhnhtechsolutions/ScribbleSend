@@ -6,6 +6,14 @@ const updateUser = user => {
   };
 };
 
+const setAllTeachers = res => {
+  // console.log('setAllTeachers', res);
+  return {
+    type: 'ALL_TEACHINGS',
+    res,
+  };
+};
+
 const removeUser = remove => {
   return {
     type: 'REMOVE_USER',
@@ -13,4 +21,4 @@ const removeUser = remove => {
   };
 };
 
-export { updateUser, removeUser };
+export { updateUser, setAllTeachers, removeUser };

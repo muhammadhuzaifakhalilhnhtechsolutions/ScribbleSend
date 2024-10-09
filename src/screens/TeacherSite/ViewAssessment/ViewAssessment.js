@@ -17,11 +17,12 @@ import {
   THEME_COLOR_LIGHT,
   White,
 } from '../../../utils/Color';
-import PDFViewer from '../../../components/PDFViewer/PDFViewer';
 import Header from '../../../components/Header/Header';
 import { PopingBold } from '../../../utils/Fonts';
 import Input from '../../../components/TextInput/Input';
 import Button from '../../../components/Button/Button';
+import VideoPlayer from 'react-native-video';
+import TeacherBoard from '../../../components/TeacherBoard/TeacherBoard';
 
 const { height } = Dimensions.get('screen');
 
@@ -52,8 +53,9 @@ const ViewAssessment = ({ navigation }) => {
         onPress={() => navigation.goBack()}
       />
       <KeyboardAvoidingView
+        style={{ flex: 1 }}
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
-        <ScrollView showsVerticalScrollIndicator={false} nestedScrollEnabled>
+        {/* <ScrollView showsVerticalScrollIndicator={false} nestedScrollEnabled>
           <View style={styles.pdfViewSec}>
             <PDFViewer
               pdfUrl={
@@ -77,6 +79,52 @@ const ViewAssessment = ({ navigation }) => {
           <Button
             title={remarks.trim() === '' ? 'Save' : 'Upload'}
             style={{ margin: 10 }}
+          />
+        </ScrollView> */}
+
+        <ScrollView showsVerticalScrollIndicator={true} nestedScrollEnabled sc>
+          <VideoPlayer
+            style={{ height: height - 200, width: '100%', marginVertical: 5 }}
+            source={{
+              uri: 'https://cdn.pixabay.com/video/2023/01/25/147898-792811387_large.mp4',
+            }}
+            controls={true}
+            resizeMode="contain"
+            controlsStyles={{
+              hideForward: false,
+              hidePrevious: true,
+              hideNext: true,
+              hideDuration: false,
+              hidePosition: true,
+              hideNavigationBarOnFullScreenMode: true,
+              hideNotificationBarOnFullScreenMode: true,
+              hideFullscreen: false,
+              seekIncrementMS: 1000,
+            }}
+            filter="CIColorInvert"
+          />
+          <TeacherBoard navigation={navigation} />
+
+          <View style={styles.remarksDiv}>
+            <Text style={styles.headingText}>Student Marks</Text>
+            <Input
+              placeholder="Marks"
+              value={remarks}
+              onChangeText={setRemarks}
+              style={styles.input}
+              cursorColor={THEME_COLOR}
+              selectionColor={THEME_COLOR_LIGHT}
+              keyboardType={'decimal-pad'}
+              maxLength={3}
+            />
+          </View>
+          <Button
+            title={'Submit'}
+            style={{
+              margin: 10,
+              backgroundColor: remarks.trim() === '' ? 'gray' : THEME_COLOR,
+            }}
+            disabled={remarks.trim() === '' ? true : false}
           />
         </ScrollView>
       </KeyboardAvoidingView>
@@ -106,6 +154,7 @@ const styles = StyleSheet.create({
     width: '96%',
     alignSelf: 'center',
     borderRadius: 10,
+    marginTop: 5,
   },
   headingText: {
     fontSize: 16,
@@ -114,7 +163,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   input: {
-    textAlignVertical: 'top',
+    textAlignVertical: 'center',
     width: '100%',
   },
 });

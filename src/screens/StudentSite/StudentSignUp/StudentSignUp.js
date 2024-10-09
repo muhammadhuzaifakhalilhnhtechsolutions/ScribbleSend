@@ -27,6 +27,7 @@ import FastImage from 'react-native-fast-image';
 import { Formik } from 'formik';
 import { SignupSchema } from '../../../Schema/Schemas';
 import {
+  getApi,
   PostApiWithOutToken,
   PostApiWithOutTokenSignUp,
 } from '../../../api/helper';
@@ -37,16 +38,41 @@ import BackHeader from '../../../components/ShortHeader/ShortHeader';
 import messaging from '@react-native-firebase/messaging';
 import { GoogleSignin } from '@react-native-google-signin/google-signin';
 import { useDispatch } from 'react-redux';
-import { updateUser } from '../../../stores/actions/userAction';
+import { setAllTeachers, updateUser } from '../../../stores/actions/userAction';
+import DropDownPicker from '../../../components/DropDownpicker';
 
 const StudentSignUp = ({ navigation }) => {
   const [isLoading, setisLoading] = useState(false);
   const [fcmToken, setFcmToken] = useState('');
   const dispatch = useDispatch();
+  const [items, setItems] = useState([]);
+  const [value, setValue] = useState([]);
+  const [teacherLoader, setteacherLoader] = useState(false);
+  const [listError, setListError] = useState(null);
 
   useEffect(() => {
+    getAllTeacher();
     requestFCM();
   }, []);
+
+  const getAllTeacher = () => {
+    setteacherLoader(true);
+    getApi(`${BaseUrl}/api/teachers`)
+      .then(res => {
+        // console.log('res all teacehrs---->', res.data.data);
+        if (res.data.status) {
+          setItems(res.data?.data);
+          setteacherLoader(false);
+          dispatch(setAllTeachers(res.data?.data));
+        } else {
+          setteacherLoader(false);
+        }
+      })
+      .catch(err => {
+        setteacherLoader(false);
+        console.log('err all teacehrs---->', err);
+      });
+  };
 
   const requestFCM = async () => {
     messaging()
@@ -72,8 +98,6 @@ const StudentSignUp = ({ navigation }) => {
         setFcmToken(token);
       });
   };
-
-  console.log('fcm token==>', fcmToken);
 
   const signInWithGoogle = async () => {
     try {
@@ -138,7 +162,7 @@ const StudentSignUp = ({ navigation }) => {
     <SafeAreaView style={styles.main}>
       <StatusBar backgroundColor={White} barStyle={'dark-content'} />
       <BackHeader onPress={() => navigation.goBack()} />
-      {isLoading && <Loader />}
+      {isLoading || teacherLoader ? <Loader /> : null}
       <ImageBackground
         style={styles.Backimg}
         source={require('../../../assets/images/background.png')}>
@@ -154,63 +178,73 @@ const StudentSignUp = ({ navigation }) => {
                 email: '',
                 password: '',
                 confrimPassword: '',
-                FullName: '',
+                firstName: '',
+                lastName: '',
               }}
               validationSchema={SignupSchema}
               onSubmit={values => {
-                setisLoading(true);
                 console.log('values', values);
                 const userEmail = values.email?.toLocaleLowerCase()?.trim();
 
-                const formdata = new FormData();
-                formdata.append('name', values.FullName);
-                formdata.append('email', userEmail);
-                formdata.append('password', values.confrimPassword);
-                formdata.append('fcm_token', fcmToken);
-                formdata.append('device_type', Platform.OS);
-
-                PostApiWithOutTokenSignUp(
-                  `${BaseUrl}/api/student/store`,
-                  formdata,
-                )
-                  .then(res => {
-                    console.log('res signup==>', res.data);
-                    if (res.data?.status) {
-                      // navigation.navigate('StudentLogin');
-                      dispatch(updateUser(res.data));
-                      setisLoading(false);
-                      showMessage({
-                        message: 'Success',
-                        description: res.data?.response,
-                        type: 'success',
-                        floating: true,
-                        animated: true,
-                      });
-                    } else {
-                      setisLoading(false);
-                    }
-                  })
-                  .catch(error => {
-                    console.log('error signup==>', error);
-                    setisLoading(false);
-                    const errorKeys =
-                      error && Object.keys(error?.response?.data?.errors);
-                    if (errorKeys?.length > 0) {
-                      errorKeys.forEach(key => {
-                        error?.response?.data?.errors[key]?.forEach(
-                          errorMsg => {
-                            showMessage({
-                              message: 'Failed',
-                              description: errorMsg,
-                              type: 'danger',
-                              animated: true,
-                              floating: true,
-                            });
-                          },
-                        );
-                      });
-                    }
+                if (value?.length > 0) {
+                  setisLoading(true);
+                  setListError(() => null);
+                  const formdata = new FormData();
+                  formdata.append('fname', values.firstName);
+                  formdata.append('lname', values.lastName);
+                  formdata.append('email', userEmail);
+                  formdata.append('password', values.confrimPassword);
+                  formdata.append('fcm_token', fcmToken);
+                  formdata.append('device_type', Platform.OS);
+                  value.map((v, i) => {
+                    formdata.append(`teacher_id[${i}]`, v);
                   });
+
+                  PostApiWithOutTokenSignUp(
+                    `${BaseUrl}/api/student/store`,
+                    formdata,
+                  )
+                    .then(res => {
+                      console.log('res signup==>', res.data);
+                      if (res.data?.status) {
+                        // navigation.navigate('StudentLogin');
+                        dispatch(updateUser(res.data));
+                        setisLoading(false);
+                        showMessage({
+                          message: 'Success',
+                          description: res.data?.response,
+                          type: 'success',
+                          floating: true,
+                          animated: true,
+                        });
+                      } else {
+                        setisLoading(false);
+                      }
+                    })
+                    .catch(error => {
+                      console.log('error signup==>', error);
+                      setisLoading(false);
+                      const errorKeys =
+                        error && Object.keys(error?.response?.data?.errors);
+                      if (errorKeys?.length > 0) {
+                        errorKeys.forEach(key => {
+                          error?.response?.data?.errors[key]?.forEach(
+                            errorMsg => {
+                              showMessage({
+                                message: 'Failed',
+                                description: errorMsg,
+                                type: 'danger',
+                                animated: true,
+                                floating: true,
+                              });
+                            },
+                          );
+                        });
+                      }
+                    });
+                } else {
+                  setListError(() => 'Please select at least one teacher');
+                }
               }}>
               {({
                 handleChange,
@@ -222,16 +256,28 @@ const StudentSignUp = ({ navigation }) => {
               }) => (
                 <View style={styles.TextInputDiv}>
                   <Input
-                    placeholder={'Full Name'}
+                    placeholder={'First Name'}
                     placeholderTextColor={Gray}
                     style={styles.textInput}
                     cursorColor={THEME_COLOR}
                     value={values.FullName}
-                    onChangeText={handleChange('FullName')}
-                    onBlur={handleBlur('FullName')}
+                    onChangeText={handleChange('firstName')}
+                    onBlur={handleBlur('firstName')}
                   />
-                  {touched.FullName && errors.FullName ? (
-                    <Text style={styles.validation}>{errors.FullName}</Text>
+                  {touched.firstName && errors.firstName ? (
+                    <Text style={styles.validation}>{errors.firstName}</Text>
+                  ) : null}
+                  <Input
+                    placeholder={'Last Name'}
+                    placeholderTextColor={Gray}
+                    style={styles.textInput}
+                    cursorColor={THEME_COLOR}
+                    value={values.FullName}
+                    onChangeText={handleChange('lastName')}
+                    onBlur={handleBlur('lastName')}
+                  />
+                  {touched.lastName && errors.lastName ? (
+                    <Text style={styles.validation}>{errors.lastName}</Text>
                   ) : null}
                   <Input
                     placeholder={'Email'}
@@ -271,6 +317,17 @@ const StudentSignUp = ({ navigation }) => {
                       {errors.confrimPassword}
                     </Text>
                   ) : null}
+                  <DropDownPicker
+                    items={items}
+                    setItems={setItems}
+                    value={value}
+                    setValue={setValue}
+                  />
+                  {!value?.length > 0 && (
+                    <Text style={{ ...styles.validation, marginTop: -5 }}>
+                      {listError}
+                    </Text>
+                  )}
                   <Button
                     title={'Sign Up'}
                     style={styles.SigninButton}

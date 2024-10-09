@@ -18,14 +18,16 @@ import Header from '../../../components/Header/Header';
 import Input from '../../../components/TextInput/Input';
 import { PopingBold, PoppinsRegular } from '../../../utils/Fonts';
 import Button from '../../../components/Button/Button';
-import Ionicons from 'react-native-vector-icons/Ionicons';
-import { pick } from 'react-native-document-picker';
 import { showMessage } from 'react-native-flash-message';
+import moment from 'moment';
+import DateTimePickerModal from 'react-native-modal-datetime-picker';
 
 const AddAssessment = ({ navigation }) => {
   const [heading, setheading] = useState('');
   const [des, setdes] = useState('');
   const [attachments, setattachments] = useState(null);
+  const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
+  const [date, setdate] = useState(moment().format('YYYY-MM-DD'));
 
   // const handlePick = async () => {
   //   try {
@@ -37,11 +39,22 @@ const AddAssessment = ({ navigation }) => {
   //   }
   // };
 
+  const hideDatePicker = () => {
+    setDatePickerVisibility(false);
+  };
+
+  const handleConfirm = date => {
+    const formattedDate = moment(date).format('YYYY-MM-DD');
+    setdate(() => formattedDate);
+    hideDatePicker();
+  };
+
   const handleNext = () => {
     if (heading.trim() && des.trim() !== '') {
       navigation.navigate('AddQuestions', {
         heading,
         des,
+        date,
       });
     } else {
       showMessage({
@@ -83,6 +96,16 @@ const AddAssessment = ({ navigation }) => {
             placeholderTextColor="gray"
           />
         </View>
+        <View style={styles.inputCon}>
+          <Text style={styles.inputHeadingText}>Deadline</Text>
+          <TouchableOpacity
+            style={styles.calenderBtn}
+            onPress={() => setDatePickerVisibility(true)}>
+            <Text style={styles.input}>
+              {moment(date).format('DD/MM/YYYY')}
+            </Text>
+          </TouchableOpacity>
+        </View>
         {/* <View style={styles.inputCon}>
           <Text style={styles.inputHeadingText}>Attachments</Text>
           <TouchableOpacity style={styles.attachments} onPress={handlePick}>
@@ -109,6 +132,13 @@ const AddAssessment = ({ navigation }) => {
           ]}
           onPress={handleNext}
           disabled={heading.trim && des.trim() == '' ? true : false}
+        />
+
+        <DateTimePickerModal
+          isVisible={isDatePickerVisible}
+          mode="date"
+          onConfirm={handleConfirm}
+          onCancel={hideDatePicker}
         />
       </View>
     </SafeAreaView>
@@ -169,5 +199,17 @@ const styles = StyleSheet.create({
     color: 'gray',
     fontFamily: PoppinsRegular,
     width: '88%',
+  },
+  calenderBtn: {
+    backgroundColor: LightGrey,
+    width: '96%',
+    alignSelf: 'center',
+    borderRadius: 10,
+    paddingLeft: 10,
+    fontSize: 14,
+    color: Black,
+    fontFamily: PoppinsRegular,
+    paddingVertical: 14,
+    marginVertical: 10,
   },
 });

@@ -1,5 +1,6 @@
 const init = {
   user: [],
+  teachers: [],
 };
 const reducer = (state = init, action) => {
   // console.log('action user', action)
@@ -10,6 +11,13 @@ const reducer = (state = init, action) => {
       return {
         ...state,
         user: action.user,
+      };
+    }
+    case 'ALL_TEACHINGS': {
+      // console.log('action user', action.user)
+      return {
+        ...state,
+        teachers: action.res,
       };
     }
 

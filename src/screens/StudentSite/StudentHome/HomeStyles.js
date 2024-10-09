@@ -119,8 +119,8 @@ export const styles = StyleSheet.create({
     paddingVertical: 4,
   },
   input: {
-    width: '85%',
-    paddingLeft: 12,
+    width: '100%',
+    paddingHorizontal: 12,
     fontSize: 14,
     color: '#64748B',
     fontFamily: PoppinsRegular,

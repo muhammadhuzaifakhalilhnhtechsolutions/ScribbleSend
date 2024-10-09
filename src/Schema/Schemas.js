@@ -19,7 +19,8 @@ export const SignupSchema = yup.object({
     .min(8)
     .required('Please enter your password')
     .oneOf([yup.ref('password'), null], "Passwords doesn't match "),
-  FullName: yup.string().min(3).required('Please enter your full name'),
+  firstName: yup.string().min(3).required('Please enter your first name'),
+  lastName: yup.string().min(3).required('Please enter your last name'),
 });
 
 export const LoginSchema = yup.object({

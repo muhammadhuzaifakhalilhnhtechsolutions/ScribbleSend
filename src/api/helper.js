@@ -2,7 +2,7 @@ import axios from 'axios';
 import { showMessage } from 'react-native-flash-message';
 
 export const getApi = async url => {
-  console.log(url);
+  // console.log(url);
   try {
     let response = await axios.get(url);
     // console.log(response, "response")

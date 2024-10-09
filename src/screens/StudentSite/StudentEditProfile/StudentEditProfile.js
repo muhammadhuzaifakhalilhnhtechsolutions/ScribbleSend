@@ -27,20 +27,27 @@ import {
   requestMultiple,
   RESULTS,
 } from 'react-native-permissions';
-import { PostApi } from '../../../api/helper';
+import { getApi, getApiWithToken, PostApi } from '../../../api/helper';
 import { BaseUrl } from '../../../api/BaseUrl';
-import { updateUser } from '../../../stores/actions/userAction';
+import { setAllTeachers, updateUser } from '../../../stores/actions/userAction';
 import { showMessage } from 'react-native-flash-message';
 import Loader from '../../../components/Loader/Loader';
 import DeviceInfo from 'react-native-device-info';
+import DropdownComponent from '../../../components/DropDownpicker';
 
 const { height, width } = Dimensions.get('screen');
 
 const StudentEditProfile = ({ navigation }) => {
   const userData = useSelector(state => state.userReducer.user.data);
-  const [fullName, setfullName] = useState(userData.name);
+  const allTeachers = useSelector(state => state.userReducer.teachers);
+  const [fullName, setfullName] = useState(userData.fname);
+  const [lastName, setLastName] = useState(userData.lname);
   const [androidVersion, setAndroidVersion] = useState('');
+  const [teacherLoader, setteacherLoader] = useState(false);
   const [isLoading, setisLoading] = useState(false);
+  const [items, setItems] = useState([]);
+  const [value, setValue] = useState([]);
+  const [selectedTeacher, setSelectedTeacher] = useState([]);
   const dispatch = useDispatch();
   const [image, setImage] = useState({
     name: '1000000067.jpg',
@@ -49,10 +56,53 @@ const StudentEditProfile = ({ navigation }) => {
   });
 
   useEffect(() => {
+    getAllTeacher();
     const version = DeviceInfo.getSystemVersion();
     const majorVersion = version.split('.')[0];
     setAndroidVersion(majorVersion);
   }, []);
+
+  useEffect(() => {
+    if (items?.length > 0 && selectedTeacher?.length > 0) {
+      appendSelectedTeachers(selectedTeacher);
+    }
+  }, [items, selectedTeacher]);
+
+  const getAllTeacher = () => {
+    setteacherLoader(true);
+    getApi(`${BaseUrl}/api/teachers`)
+      .then(res => {
+        // console.log('res all teacehrs---->', res.data.data);
+        if (res.data.status) {
+          setItems(res.data?.data);
+          getSelectedTeacher();
+          dispatch(setAllTeachers(res.data?.data));
+        } else {
+          setteacherLoader(false);
+        }
+      })
+      .catch(err => {
+        setteacherLoader(false);
+        console.log('err all teacehrs---->', err);
+      });
+  };
+
+  const getSelectedTeacher = () => {
+    getApiWithToken(`${BaseUrl}/api/student/teachers`, '', userData.token)
+      .then(res => {
+        // console.log('res selected teacehrs---->', res.data.data);
+        if (res.data.status) {
+          setSelectedTeacher(res.data.data);
+          appendSelectedTeachers(res.data.data);
+        } else {
+          setteacherLoader(false);
+        }
+      })
+      .catch(err => {
+        setteacherLoader(false);
+        console.log('err selected teacehrs---->', err);
+      });
+  };
 
   const requestPermissions = async () => {
     if (Platform.OS === 'android') {
@@ -117,8 +167,14 @@ const StudentEditProfile = ({ navigation }) => {
   const handleSubmit = () => {
     setisLoading(true);
     const formdata = new FormData();
-    formdata.append('name', fullName);
+    formdata.append('fname', fullName);
+    formdata.append('lname', lastName);
     formdata.append('image', image);
+    value.map((v, i) => {
+      formdata.append(`teacher_id[${i}]`, v);
+    });
+
+    console.log(formdata);
 
     PostApi(`${BaseUrl}/api/student/profile/update`, formdata, userData?.token)
       .then(res => {
@@ -166,10 +222,30 @@ const StudentEditProfile = ({ navigation }) => {
       });
   };
 
+  const appendSelectedTeachers = data => {
+    setValue(prev => {
+      const updatedValues = [...prev];
+      items?.forEach(val => {
+        data?.forEach(teacher => {
+          if (
+            val.id === teacher.teacher_id &&
+            !updatedValues.includes(val.id)
+          ) {
+            updatedValues.push(val.id);
+          }
+        });
+      });
+
+      return updatedValues;
+    });
+
+    setteacherLoader(false);
+  };
+
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar backgroundColor={THEME_COLOR} barStyle={'light-content'} />
-      {isLoading && <Loader />}
+      {isLoading || teacherLoader ? <Loader /> : null}
       <Header
         icon={true}
         onPress={() => navigation.goBack()}
@@ -200,11 +276,28 @@ const StudentEditProfile = ({ navigation }) => {
             />
           </View>
           <View style={styles.inputDiv}>
-            <Text style={styles.lebal}>Full Name:</Text>
+            <Text style={styles.lebal}>First Name:</Text>
             <Input
               placeholder="Full Name"
               value={fullName}
               onChangeText={setfullName}
+            />
+          </View>
+          <View style={styles.inputDiv}>
+            <Text style={styles.lebal}>Last Name:</Text>
+            <Input
+              placeholder="Last Name"
+              value={lastName}
+              onChangeText={setLastName}
+            />
+          </View>
+          <View style={styles.inputDiv}>
+            <Text style={styles.lebal}>Selected Teachers:</Text>
+            <DropdownComponent
+              items={items}
+              setItems={setItems}
+              value={value}
+              setValue={setValue}
             />
           </View>
           <Button

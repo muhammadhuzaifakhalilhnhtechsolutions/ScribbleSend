@@ -5,8 +5,6 @@ import {
   PermissionsAndroid,
   Platform,
   SafeAreaView,
-  ScrollView,
-  StatusBar,
   StyleSheet,
   ToastAndroid,
   TouchableOpacity,
@@ -15,13 +13,13 @@ import {
   Image,
 } from 'react-native';
 import React, { useState, useRef, useEffect } from 'react';
-import { Black, THEME_COLOR, White } from '../../../utils/Color';
+import { Black, THEME_COLOR, White } from '../../utils/Color';
 import RNSketchCanvas from '@sourcetoad/react-native-sketch-canvas';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import RNFS from 'react-native-fs';
 import moment from 'moment';
-import DraggableText from '../../../components/DragableText/DragableText';
-import { TextModal } from '../../../components/Modals/Modals';
+import DraggableText from '../../components/DragableText/DragableText';
+import { TextModal } from '../../components/Modals/Modals';
 import RecordScreen, { RecordingResult } from 'react-native-record-screen';
 import { PERMISSIONS, request, RESULTS } from 'react-native-permissions';
 import DeviceInfo from 'react-native-device-info';
@@ -29,15 +27,13 @@ import Share from 'react-native-share';
 import { captureRef } from 'react-native-view-shot';
 import { PDFDocument } from 'pdf-lib';
 import { encode } from 'base64-arraybuffer';
-import Loader from '../../../components/Loader/Loader';
+import Loader from '../../components/Loader/Loader';
 import { showMessage } from 'react-native-flash-message';
-import { ReactNativeZoomableView } from '@openspacelabs/react-native-zoomable-view';
-import OrientationLocker from 'react-native-orientation-locker';
-import { PopingBold } from '../../../utils/Fonts';
+import { PopingBold } from '../../utils/Fonts';
 
 const { height, width } = Dimensions.get('window');
 
-const StaticWhiteBoard = ({ navigation }) => {
+const TeacherBoard = ({ navigation }) => {
   const [textDataList, setTextDataList] = useState([]);
   const [selectedTextId, setSelectedTextId] = useState(null);
   const [modalVisibleText, setModalVisibleText] = useState(false);
@@ -45,17 +41,10 @@ const StaticWhiteBoard = ({ navigation }) => {
   const [isRecording, setisRecording] = useState(false);
   const [androidVersion, setAndroidVersion] = useState('');
   const [shareLoading, setshareLoading] = useState(false);
-  const [drawingPage, setDrawingPage] = useState(2);
+  const [drawingPage, setDrawingPage] = useState(1);
   const svgRef = useRef(null);
   const textInputRef = useRef(null);
   const canvasRef = useRef();
-
-  useEffect(() => {
-    OrientationLocker.lockToLandscape();
-    return () => {
-      OrientationLocker.lockToPortrait();
-    };
-  }, []);
 
   useEffect(() => {
     const version = DeviceInfo.getSystemVersion();
@@ -325,27 +314,26 @@ const StaticWhiteBoard = ({ navigation }) => {
   return (
     <SafeAreaView style={styles.container}>
       {shareLoading && <Loader />}
-      <StatusBar barStyle={'dark-content'} backgroundColor={White} />
       <View style={styles.main}>
-        <View style={[styles.scrollIndicator]}>
+        {/* <View style={[styles.scrollIndicator]}>
           <MaterialCommunityIcons
             name="arrow-up"
             color={THEME_COLOR}
-            size={30}
+            size={20}
           />
           <MaterialCommunityIcons
             name="arrow-down"
             color={THEME_COLOR}
-            size={30}
+            size={10}
           />
-        </View>
+        </View> */}
         <View style={styles.btnCOntainer}>
           <View style={styles.btnBox}>
             <TouchableOpacity
               style={styles.functionButton}
               onPress={addNewText}>
               <Image
-                source={require('../../../assets/images/textool.png')}
+                source={require('../../assets/images/textool.png')}
                 style={{ height: 30, width: 30 }}
                 resizeMode="contain"
               />
@@ -366,22 +354,22 @@ const StaticWhiteBoard = ({ navigation }) => {
             </TouchableOpacity>
             <Text style={styles.btnText}>Recording</Text>
           </View>
-          <View style={styles.btnBox}>
+          {/* <View style={styles.btnBox}>
             <TouchableOpacity
               style={styles.functionButton}
               onPress={() => handleFunctions('share')}>
               <Image
-                source={require('../../../assets/images/share.png')}
+                source={require('../../assets/images/share.png')}
                 style={{ height: 30, width: 30 }}
                 resizeMode="contain"
               />
             </TouchableOpacity>
             <Text style={styles.btnText}>share</Text>
-          </View>
+          </View> */}
           <View style={styles.btnBox}>
             <TouchableOpacity style={styles.functionButton} onPress={addPages}>
               <Image
-                source={require('../../../assets/images/addDocument.png')}
+                source={require('../../assets/images/addDocument.png')}
                 style={{ height: 30, width: 30 }}
                 resizeMode="contain"
               />
@@ -396,7 +384,7 @@ const StaticWhiteBoard = ({ navigation }) => {
                 setTextDataList([]);
               }}>
               <Image
-                source={require('../../../assets/images/refresh.png')}
+                source={require('../../assets/images/refresh.png')}
                 style={{ height: 30, width: 30 }}
                 resizeMode="contain"
               />
@@ -410,7 +398,7 @@ const StaticWhiteBoard = ({ navigation }) => {
                 canvasRef.current?.undo();
               }}>
               <Image
-                source={require('../../../assets/images/eraser.png')}
+                source={require('../../assets/images/eraser.png')}
                 style={{ height: 30, width: 30 }}
                 resizeMode="contain"
               />
@@ -418,110 +406,48 @@ const StaticWhiteBoard = ({ navigation }) => {
             <Text style={styles.btnText}>erase</Text>
           </View>
         </View>
-        <ScrollView nestedScrollEnabled={false}>
-          {/* <ReactNativeZoomableView
-            bindToBorders={true}
-            maxZoom={6}
-            minZoom={0.9}
-            zoomStep={0.5}
-            initialZoom={1}> */}
-          <View ref={svgRef} style={{ flex: 1, width: '96%', marginTop: 5 }}>
-            <RNSketchCanvas
-              ref={canvasRef}
-              containerStyle={{
-                backgroundColor: 'transparent',
-                width: '100%',
-                flex: 1,
-              }}
-              canvasStyle={{
-                backgroundColor: '#EEE',
-                height: height * 2 * drawingPage,
-                width: '100%',
-              }}
-              defaultStrokeIndex={0}
-              defaultStrokeWidth={2}
-              // onClearPressed={() => setTextDataList([])}
-              // undoComponent={
-              //   <View style={styles.functionButton}>
-              //     <MaterialCommunityIcons
-              //       name="eraser"
-              //       size={20}
-              //       color={White}
-              //     />
-              //   </View>
-              // }
-              // clearComponent={
-              //   <View style={styles.functionButton}>
-              //     <MaterialCommunityIcons
-              //       name="delete"
-              //       size={20}
-              //       color={White}
-              //     />
-              //   </View>
-              // }
-              // eraseComponent={
-              //   <View style={styles.functionButton}>
-              //     <MaterialCommunityIcons
-              //       name="eraser"
-              //       size={20}
-              //       color={White}
-              //     />
-              //   </View>
-              // }
-              strokeComponent={color => (
-                <View
-                  style={[
-                    {
-                      backgroundColor: color,
-                    },
-                    styles.strokeColorButton,
-                  ]}
-                />
-              )}
-              // strokeSelectedComponent={(color, index, changed) => {
-              //   return (
-              //     <View
-              //       style={[
-              //         { backgroundColor: color, borderWidth: 2 },
-              //         styles.strokeColorButton,
-              //       ]}
-              //     />
-              //   );
-              // }}
-              // strokeWidthComponent={w => {
-              //   return (
-              //     <View style={styles.strokeWidthButton}>
-              //       <View
-              //         style={{
-              //           backgroundColor: 'white',
-              //           marginHorizontal: 2.5,
-              //           width: Math.sqrt(w / 3) * 10,
-              //           height: Math.sqrt(w / 3) * 10,
-              //           borderRadius: (Math.sqrt(w / 3) * 10) / 2,
-              //         }}
-              //       />
-              //     </View>
-              //   );
-              // }}
-            />
-
-            {textDataList.map(textData => (
-              <DraggableText
-                key={textData.id}
-                textData={textData}
-                textDataList={textDataList}
-                setTextDataList={setTextDataList}
-                isSelected={textData.id == selectedTextId}
-                onSelectText={handleSelectText}
-                onStartDrag={() => setSelectedTextId(() => textData.id)}
-                onEndDrag={() => setSelectedTextId(() => null)}
-                handleEditText={handleEditText}
-                handleDeleteText={handleDeleteText}
+        <View ref={svgRef} style={{ flex: 1, width: '96%', marginTop: 5 }}>
+          <RNSketchCanvas
+            ref={canvasRef}
+            containerStyle={{
+              backgroundColor: 'transparent',
+              width: '100%',
+              flex: 1,
+            }}
+            canvasStyle={{
+              backgroundColor: '#EEE',
+              height: height * drawingPage,
+              width: '100%',
+            }}
+            defaultStrokeIndex={0}
+            defaultStrokeWidth={2}
+            strokeComponent={color => (
+              <View
+                style={[
+                  {
+                    backgroundColor: color,
+                  },
+                  styles.strokeColorButton,
+                ]}
               />
-            ))}
-          </View>
-          {/* </ReactNativeZoomableView> */}
-        </ScrollView>
+            )}
+          />
+
+          {textDataList.map(textData => (
+            <DraggableText
+              key={textData.id}
+              textData={textData}
+              textDataList={textDataList}
+              setTextDataList={setTextDataList}
+              isSelected={textData.id == selectedTextId}
+              onSelectText={handleSelectText}
+              onStartDrag={() => setSelectedTextId(() => textData.id)}
+              onEndDrag={() => setSelectedTextId(() => null)}
+              handleEditText={handleEditText}
+              handleDeleteText={handleDeleteText}
+            />
+          ))}
+        </View>
 
         <TextModal
           modalVisibleText={modalVisibleText}
@@ -538,7 +464,7 @@ const StaticWhiteBoard = ({ navigation }) => {
   );
 };
 
-export default StaticWhiteBoard;
+export default TeacherBoard;
 
 const styles = StyleSheet.create({
   container: {
@@ -551,6 +477,8 @@ const styles = StyleSheet.create({
     width: '98%',
     alignSelf: 'center',
     backgroundColor: White,
+    // marginVertical:10,
+    // marginBottom:80
   },
   strokeColorButton: {
     marginHorizontal: 2.5,
@@ -600,13 +528,15 @@ const styles = StyleSheet.create({
   },
   scrollIndicator: {
     position: 'absolute',
-    width: 28,
+    width: 14,
     top: 0,
     right: 0,
     borderRadius: 5,
     justifyContent: 'space-around',
     alignItems: 'center',
     alignSelf: 'center',
-    height: 330,
+    height: height * 0.93,
+    backgroundColor: 'red',
+    zIndex: 1,
   },
 });
